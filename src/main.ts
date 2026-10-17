@@ -33,6 +33,92 @@ function setTheme(dark: boolean) {
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
 }
 
+function getRecommendedAction(state: GameState): {
+  actionId: ActionId;
+  reason: string;
+  urgency: 'normal' | 'warn' | 'danger';
+} {
+  const rankDef = getRankDef(state.player.rankId);
+  const divDef = getDivisionDef(state.player.divisionId);
+  const slotsLeft = getRemainingSlotsInMonth(state);
+  const slotsNeeded = estimateSlotsNeededForMonth(state);
+  const canStudy = needsExamForSpecialist(state);
+
+  if (state.player.blockedSlots > 0) {
+    return {
+      actionId: 'primary_work',
+      reason: `本時段因「${state.player.blockedReason}」鎖定，請點擊下方按鈕推進時段。`,
+      urgency: 'warn',
+    };
+  }
+
+  // 1. Critical stress warning (>= 65)
+  if (state.player.stress >= 68) {
+    if (state.player.annualLeaveLeft > 0 && slotsLeft > slotsNeeded) {
+      return {
+        actionId: 'take_leave',
+        reason: `⚠️ 情緒負壓已高達 ${state.player.stress}/100（滿 70 產出減半、滿 100 過勞结局）！建議立即【請休特休假】降壓！`,
+        urgency: 'danger',
+      };
+    }
+    return {
+      actionId: 'relax_idle',
+      reason: `⚠️ 情緒負壓已高達 ${state.player.stress}/100（滿 70 產出減半）！建議先點選【茶水間摸魚喘息】降壓！`,
+      urgency: 'danger',
+    };
+  }
+
+  // 2. Training month (Year 1 Month 1)
+  if (state.kpi.isTrainingMonth) {
+    return {
+      actionId: 'slack_study',
+      reason: '💡 1月份為職前訓練月（免算 KPI），強烈建議連續點選【偷懶看書】衝高 7 月高考上榜率！',
+      urgency: 'normal',
+    };
+  }
+
+  // 3. Monthly KPI not yet met
+  if (state.kpi.secondaryProgress < state.kpi.secondaryTarget) {
+    return {
+      actionId: rankDef.isManagement ? 'mgmt_coord' : 'secondary_work',
+      reason: `📌 本月「${divDef.secondaryKpi.label}」尚未完成（${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}），建議優先點選完成！`,
+      urgency: slotsNeeded >= slotsLeft ? 'danger' : 'normal',
+    };
+  }
+
+  if (state.kpi.primaryProgress < state.kpi.primaryTarget) {
+    const rem = state.kpi.primaryTarget - state.kpi.primaryProgress;
+    return {
+      actionId: rankDef.isManagement ? 'mgmt_supervise' : 'primary_work',
+      reason: `📌 本月「${divDef.primaryKpi.label}」還差 ${rem} ${divDef.primaryKpi.unit}（剩餘 ${slotsLeft} 格時段，需工作 ${slotsNeeded} 格），建議先跑完檢查確保達標！`,
+      urgency: slotsNeeded >= slotsLeft ? 'warn' : 'normal',
+    };
+  }
+
+  // 4. Monthly KPI already 100% completed!
+  if (canStudy) {
+    return {
+      actionId: 'slack_study',
+      reason: `✅ 本月兩項 KPI 已 100% 達標！剩餘 ${slotsLeft} 個時段可安心點選【偷懶看書】衝刺國考！`,
+      urgency: 'normal',
+    };
+  }
+
+  if (state.player.stress >= 40) {
+    return {
+      actionId: 'relax_idle',
+      reason: `✅ 本月 KPI 已全數達標！建議點選【摸魚喘息】調降情緒負壓（目前 ${state.player.stress}/100）。`,
+      urgency: 'normal',
+    };
+  }
+
+  return {
+    actionId: rankDef.isManagement ? 'mgmt_supervise' : 'primary_work',
+    reason: '✅ 本月 KPI 已達標且身心狀況良好，可繼續執行業務累積長官好感與聲望。',
+    urgency: 'normal',
+  };
+}
+
 function startNewGame(playerName: string) {
   const rng = createRng(Date.now());
   const randomDiv = rng.pick(DIVISIONS);
@@ -56,24 +142,24 @@ function renderTitleScreen() {
             <div class="official-seal">北辰<br/>勞檢</div>
             <div class="gov-title">
               <h1>北辰市勞動檢查處・勞動檢查員模擬器</h1>
-              <div class="gov-subtitle">公職生存 × 績效精算 × 國考轉正 × 官場升遷五年傳奇</div>
+              <div class="gov-subtitle">公職生存 × 現場稽查實錄 × 國考轉正 × 處長升遷傳奇</div>
             </div>
           </div>
           <button class="btn-small" id="btn-theme">${darkMode ? '☀️ 淺色公文' : '🌙 深色模式'}</button>
         </div>
 
         <p style="margin-bottom: 14px;">
-          你剛錄取成為<strong>北辰市勞動檢查處</strong>的「約聘檢查員」。在接下來的<strong>五年（民國116年至120年，共 480 個上下午時段）</strong>裡，你必須在繁重的工地與工廠稽查指標、層出不窮的重大職災與甩鍋事件、瀕臨崩潰的情緒負壓之間，偷偷擠出時間苦讀法條通過國家考試，一路從基層約聘邁向<strong>簡任第十一職等處長</strong>之巔！
+          你剛錄取成為<strong>北辰市勞動檢查處</strong>的「約聘檢查員」。在接下來的<strong>五年（民國116年至120年）</strong>裡，你每個上下午時段都要做出抉擇：究竟要先跑完每月的工地與工廠稽查指標、在茶水間摸魚緩解高壓，還是趁空檔偷偷苦讀法條拼上國家考試，一路升上<strong>簡任第十一職等處長</strong>？
         </p>
 
         <div class="panel-box" style="margin-bottom: 16px; background: var(--bg-paper-alt);">
-          <div class="panel-heading">📌 核心生存守則</div>
-          <ul style="padding-left: 20px; font-size: 0.9rem; display: flex; flex-direction: column; gap: 6px;">
-            <li><strong>時間換算</strong>：每天分為上午、下午 2 格（1 天 ＝ 1 週，每月 4 週共 8 格）。</li>
-            <li><strong>績效底線</strong>：每月主、次要 KPI 必須 100% 達標。<strong>半年內累計 3 個月未達標即送考評汰除！</strong>累計 2 個月未達標列乙等（不得升遷並遭主管約談）。</li>
-            <li><strong>國考轉正</strong>：偷懶看書不會被抓，但會壓縮跑檢查的格數。逐階應考與跨階應考難度不同，<strong>唯有考上才會重置累積讀書加成</strong>。</li>
-            <li><strong>情緒負壓</strong>：負壓達 <strong>70</strong> 時工作產出全面減半；達 <strong>100</strong> 立即過勞倒下結束遊戲。</li>
-          </ul>
+          <div class="panel-heading">📌 4 句話看懂怎麼玩</div>
+          <ol style="padding-left: 20px; font-size: 0.92rem; display: flex; flex-direction: column; gap: 6px;">
+            <li><strong>先看每月進度條</strong>：每個月有 8 個時段（4 週 × 上下午），通常做 <strong>6 次工作</strong>就能把本月兩項 KPI 填滿達標。</li>
+            <li><strong>有多餘時段再偷看書</strong>：偷看書不會被抓，但會少做工作；<strong>半年內只要有 3 個月沒達標就會被開除！</strong></li>
+            <li><strong>注意情緒負壓</strong>：每次外出稽查與辦案都會累積負壓（+5～+6），<strong>偷看書不會降壓</strong>，負壓快到 70 時記得按「摸魚」或「休假」喘口氣。</li>
+            <li><strong>小心突發事件</strong>：目前每格有 <strong>36% 高機率</strong>遇到工安意外、前輩甩鍋、議員關說或塞紅包，隨時可能打亂你的排程！</li>
+          </ol>
         </div>
 
         <div class="form-row">
@@ -180,6 +266,10 @@ function renderMainGame(state: GameState) {
   const slotsNeeded = estimateSlotsNeededForMonth(state);
   const penaltyActive = isStressPenaltyActive(state);
   const canStudy = needsExamForSpecialist(state);
+  const rec = getRecommendedAction(state);
+
+  const pDone = state.kpi.primaryProgress >= state.kpi.primaryTarget;
+  const sDone = state.kpi.secondaryProgress >= state.kpi.secondaryTarget;
 
   const pPct =
     state.kpi.primaryTarget > 0
@@ -200,268 +290,122 @@ function renderMainGame(state: GameState) {
       ? 'stress-warn'
       : 'stress-ok';
 
-  let calcTone = 'safe';
-  let calcText = `本月剩餘 ${slotsLeft} 個時段，預估還需 ${slotsNeeded} 個工作時段即可達標（尚有 ${Math.max(0, slotsLeft - slotsNeeded)} 格裕度可讀書或調適）。`;
-  if (state.kpi.isTrainingMonth) {
-    calcTone = 'safe';
-    calcText = '本月為新進人員職前專業訓練月（免計績效目標），可放心全力讀書準備國考！';
-  } else if (slotsNeeded > slotsLeft) {
-    calcTone = 'danger';
-    calcText = `⚠️ 警報：本月剩餘 ${slotsLeft} 格，但預估需要 ${slotsNeeded} 格才能完成 KPI，本月極可能未達標！`;
-  } else if (slotsNeeded === slotsLeft && slotsNeeded > 0) {
-    calcTone = 'tight';
-    calcText = `⚡ 緊繃：本月剩餘 ${slotsLeft} 格剛好等於所需工作格數 ${slotsNeeded} 格，一旦再偷懶或遭遇職災打斷就會未達標！`;
-  }
+  const perPrimaryGain = getEffectiveActionOutput(state, divDef.primaryKpi.perAction);
+  const perSecondaryGain = getEffectiveActionOutput(state, divDef.secondaryKpi.perAction);
 
   const nextExamText = !canStudy
-    ? '已取得薦任官資格（無須再考）'
+    ? '已具薦任資格（免考）'
+    : state.pendingExam
+    ? `等待放榜（${state.pendingExam.announceMonth}月第${state.pendingExam.announceWeek}週）`
     : state.time.month < 7
     ? '7月第1週 高考三級'
     : state.time.month === 11 &&
       (115 + state.time.year) % 2 === 1 &&
       state.player.rankId === 'assistant'
-    ? '本月第1週 薦任升官等考試'
-    : '12月第1週 地方政府特考';
+    ? '本月第1週 薦任升官等'
+    : '12月第1週 地方特考';
 
-  const perPrimaryGain = getEffectiveActionOutput(state, divDef.primaryKpi.perAction);
-  const perSecondaryGain = getEffectiveActionOutput(state, divDef.secondaryKpi.perAction);
-
-  const rankLadderHtml = RANKS.map((r) => {
-    const isCurrent = r.id === state.player.rankId;
-    return `<span style="padding:2px 7px; border-radius:4px; font-size:0.75rem; border:1px solid var(--border-doc); ${
-      isCurrent ? 'background:var(--seal-red); color:#fff; font-weight:700;' : 'opacity:0.7;'
-    }">${r.title}</span>`;
-  }).join(' → ');
+  const fb = state.lastFeedback;
 
   appEl.innerHTML = `
     <div class="app-shell">
       <div class="doc-sheet">
-        <!-- Top Official Header -->
+        <!-- 1. Simplified Top Bar -->
         <div class="gov-header">
           <div class="gov-title-group">
             <div class="official-seal">北辰<br/>勞檢</div>
             <div class="gov-title">
-              <h1>北辰市勞動檢查處・公文與差勤系統</h1>
-              <div class="gov-subtitle">${state.player.name}｜${rankDef.title}（${rankDef.grade}）｜派駐【${divDef.name}】</div>
+              <h1>${state.player.name}｜${rankDef.title}（${divDef.name}）</h1>
+              <div class="gov-subtitle">
+                目標：5年內從約聘升任處長（目前第 ${state.time.year}/5 年・${
+    state.player.practicalTrainingMonths > 0
+      ? `🌱 實務訓練剩 ${state.player.practicalTrainingMonths} 個月轉正`
+      : `本職級年資 ${state.player.monthsInRank} 個月`
+  }）
+              </div>
             </div>
           </div>
           <div class="header-controls">
-            <span class="badge-time">${formatTimeLabel(state)}（第 ${state.time.year}/5 年）</span>
-            <button class="btn-small" id="btn-save-1">💾 存檔1</button>
-            <button class="btn-small" id="btn-load-1">📂 讀檔1</button>
+            <span class="badge-time">${formatTimeLabel(state)}</span>
+            <button class="btn-small" id="btn-save-1">💾 存檔</button>
+            <button class="btn-small" id="btn-load-1">📂 讀檔</button>
             <button class="btn-small" id="btn-theme">${darkMode ? '☀️' : '🌙'}</button>
-            <button class="btn-small" id="btn-title">🏠 標題</button>
+            <button class="btn-small" id="btn-title">🏠</button>
           </div>
         </div>
 
-        <!-- Career Ladder Strip -->
-        <div style="margin-bottom: 14px; padding: 8px 12px; background: var(--bg-paper-alt); border: 1px solid var(--border-doc); border-radius: 4px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">
-          <div style="display:flex; align-items:center; gap:4px; flex-wrap:wrap;">
-            <strong style="font-size:0.8rem; margin-right:4px;">職級階梯：</strong>${rankLadderHtml}
-          </div>
-          <div style="font-size:0.8rem; color:var(--ink-secondary);">
-            ${
-              state.player.practicalTrainingMonths > 0
-                ? `🌱 國考實務訓練中（剩餘 ${state.player.practicalTrainingMonths} 個月轉正）`
-                : `本職級年資：${state.player.monthsInRank} 個月`
-            }
-          </div>
+        <!-- 2. Clear Step-by-Step Guidance Banner ("What should I click right now?") -->
+        <div class="guidance-banner ${rec.urgency}">
+          <div class="guidance-step">👉 下一步行動指引（本月還剩 <strong>${slotsLeft}</strong> 個時段，完成KPI還需 <strong>${slotsNeeded}</strong> 格）</div>
+          <div class="guidance-reason">${rec.reason}</div>
         </div>
 
-        <!-- Main Two-Column Dashboard -->
-        <div class="dashboard-grid">
-          <!-- Left: Monthly KPI & Half-Year Assessment -->
-          <div class="panel-box">
-            <div class="panel-heading">
-              <span>📊 ${state.time.month}月份科室績效目標（${divDef.name}）</span>
-              <span style="font-size:0.78rem; color:var(--ink-secondary);">
-                ${
-                  state.kpi.officialLeaveSlots > 0
-                    ? `公假調降 (${state.kpi.officialLeaveSlots}格)`
-                    : '標準全月指標'
-                }
-              </span>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>主要KPI：${divDef.primaryKpi.label}（每格 +${perPrimaryGain} ${divDef.primaryKpi.unit}）</span>
-                <strong>${state.kpi.primaryProgress} / ${state.kpi.primaryTarget} ${divDef.primaryKpi.unit}</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${
-                  state.kpi.primaryProgress >= state.kpi.primaryTarget ? 'kpi-done' : 'kpi'
-                }" style="width: ${pPct}%"></div>
-              </div>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>次要KPI：${divDef.secondaryKpi.label}（每格 +${perSecondaryGain} ${divDef.secondaryKpi.unit}）</span>
-                <strong>${state.kpi.secondaryProgress} / ${state.kpi.secondaryTarget} ${divDef.secondaryKpi.unit}</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${
-                  state.kpi.secondaryProgress >= state.kpi.secondaryTarget ? 'kpi-done' : 'kpi'
-                }" style="width: ${sPct}%"></div>
-              </div>
-            </div>
-
-            <div class="calc-banner ${calcTone}">
-              <span>${calcText}</span>
-            </div>
-
-            <div style="margin-top: 14px; padding-top: 10px; border-top: 1px dashed var(--border-doc);">
-              <div style="display:flex; justify-content:space-between; font-size:0.84rem;">
-                <span><strong>半年度考評追蹤</strong>（6月、12月底結算，未達標達 3 個月即汰除）：</span>
-                <strong style="color:${
-                  state.halfYearFailedMonths >= 2 ? 'var(--seal-red)' : 'var(--ink-primary)'
-                }">已未達標 ${state.halfYearFailedMonths} / 3 個月</strong>
-              </div>
-              <div class="halfyear-pills">
-                ${
-                  state.halfYearMonthResults.length === 0
-                    ? '<span style="font-size:0.8rem; color:var(--ink-muted);">本半年尚無已結算月份</span>'
-                    : state.halfYearMonthResults
-                        .map(
-                          (m) =>
-                            `<span class="month-pill ${m.passed ? 'pass' : 'fail'}">${m.month}月：${
-                              m.exempt ? '訓練免計' : m.passed ? '達標' : '未達標'
-                            }</span>`
-                        )
-                        .join('')
-                }
-              </div>
-            </div>
-          </div>
-
-          <!-- Right: Emotional Stress, Exam & Calendar -->
-          <div class="panel-box">
-            <div class="panel-heading">
-              <span>🧠 身心狀態與國考進度</span>
-              <span style="font-size:0.78rem; color:${
-                penaltyActive ? 'var(--seal-red)' : 'var(--ink-secondary)'
-              }; font-weight:700;">
-                ${penaltyActive ? '⚠️ 負壓過高：工作產出減半！' : '工作效率正常 (100%)'}
-              </span>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>情緒負壓（≥70 效率減半，100 過勞崩潰）</span>
-                <strong style="color:${
-                  state.player.stress >= 70 ? 'var(--seal-red)' : 'inherit'
-                }">${state.player.stress} / 100</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${stressClass}" style="width: ${state.player.stress}%"></div>
-              </div>
-            </div>
-
-            <div class="officer-strip" style="margin-bottom: 10px; padding: 10px;">
-              <div class="officer-cell">
-                <span class="officer-label">國考準備把握度</span>
-                <span class="officer-value" style="font-size:0.88rem;">${getStudyReadinessHint(state)}</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">下次應試期程</span>
-                <span class="officer-value" style="font-size:0.88rem;">${
-                  state.pendingExam
-                    ? `等待放榜（${state.pendingExam.announceMonth}月第${state.pendingExam.announceWeek}週）`
-                    : nextExamText
-                }</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">長官好感 / 社會聲望</span>
-                <span class="officer-value" style="font-size:0.88rem;">${state.player.bossFavor} / ${state.player.reputation}</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">年度特休假剩餘</span>
-                <span class="officer-value" style="font-size:0.88rem;">${state.player.annualLeaveLeft} 格（不調降KPI）</span>
-              </div>
-            </div>
-
-            <div style="font-size:0.8rem; color:var(--ink-secondary); margin-bottom:4px;">
-              📅 本月四週時段進度（每週＝上午＋下午 2 格）：
-            </div>
-            <div class="slot-dots">
-              ${[1, 2, 3, 4]
-                .map(
-                  (w) => `
-                <div class="week-box ${state.time.week === w ? 'active' : ''}">
-                  第${w}週<br/>
-                  ${
-                    state.time.week === w
-                      ? state.time.slot === 'AM'
-                        ? '▶ 上午'
-                        : '▶ 下午'
-                      : state.time.week > w
-                      ? '✓ 已結束'
-                      : '待執行'
-                  }
-                </div>`
-                )
-                .join('')}
-            </div>
-          </div>
-        </div>
-
-        <!-- Action Selection Panel -->
-        <div class="panel-box" style="margin-bottom: 18px;">
+        <!-- 3. Action Buttons RIGHT AT THE TOP where the player interacts -->
+        <div class="panel-box action-stage">
           <div class="panel-heading">
-            <span>⚡ 選擇本時段行動（${formatTimeLabel(state)}）</span>
-            <span style="font-size:0.8rem; color:var(--ink-secondary);">
-              ${
-                state.player.blockedSlots > 0
-                  ? `🔒 本時段已被「${state.player.blockedReason}」鎖定`
-                  : '點擊下方行動卡推進半天（1格）行程'
-              }
-            </span>
+            <span>⚡ 請點選本時段（${state.time.slot === 'AM' ? '上午' : '下午'}）要執行的工作</span>
+            <span style="font-size:0.8rem; color:var(--ink-secondary);">帶有「★ 推薦」標記為系統建議</span>
           </div>
 
           <div class="actions-grid">
             ${
               state.player.blockedSlots > 0
-                ? `<button class="action-card" data-action="primary_work">
+                ? `<button class="action-card recommended" data-action="primary_work">
                     <div class="action-title">
                       <span>⏳ 執行鎖定行程：${state.player.blockedReason}</span>
-                      <span class="action-tag">必選</span>
+                      <span class="action-tag rec-badge">★ 必點推進</span>
                     </div>
-                    <div class="action-desc">因重大職災後續調查或國家考試下午場次，本時段無法排定其他業務。</div>
+                    <div class="action-desc">因重大職災後續調查或國家考試下午場次，點擊此處推進本時段。</div>
                   </button>`
                 : rankDef.isManagement
                 ? `
-                  <button class="action-card" data-action="mgmt_supervise">
+                  <button class="action-card ${
+                    rec.actionId === 'mgmt_supervise' ? 'recommended' : ''
+                  }" data-action="mgmt_supervise">
                     <div class="action-title">
                       <span>📋 督導科室專案稽查</span>
-                      <span class="action-tag">主KPI +${getEffectiveActionOutput(
-                        state,
-                        divDef.primaryKpi.perAction,
-                        1.25
-                      )} ${divDef.primaryKpi.unit}</span>
+                      <span class="action-tag ${pDone ? 'done-tag' : ''}">
+                        ${rec.actionId === 'mgmt_supervise' ? '★ 推薦｜' : ''}主KPI +${getEffectiveActionOutput(
+                    state,
+                    divDef.primaryKpi.perAction,
+                    1.25
+                  )} ${divDef.primaryKpi.unit}
+                      </span>
                     </div>
-                    <div class="action-desc">督導並核閱下屬檢查報告、帶隊聯合稽查（負壓 +2，長官好感 +2）</div>
+                    <div class="action-desc">核閱下屬報告並帶隊稽查（目前 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}｜負壓 +5）</div>
                   </button>
-                  <button class="action-card" data-action="mgmt_coord">
+                  <button class="action-card ${
+                    rec.actionId === 'mgmt_coord' ? 'recommended' : ''
+                  }" data-action="mgmt_coord">
                     <div class="action-title">
-                      <span>🏛️ 主持跨局處與專案協調</span>
-                      <span class="action-tag">次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}</span>
+                      <span>🏛️ 主持跨局處協調會</span>
+                      <span class="action-tag ${sDone ? 'done-tag' : ''}">
+                        ${rec.actionId === 'mgmt_coord' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}
+                      </span>
                     </div>
-                    <div class="action-desc">主持重大勞資、工安專案會議與府級報告（負壓 +1，聲望 +2）</div>
+                    <div class="action-desc">主持重大勞資工安專案會議（目前 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}｜負壓 +5）</div>
                   </button>
                 `
                 : `
-                  <button class="action-card" data-action="primary_work">
+                  <button class="action-card ${
+                    rec.actionId === 'primary_work' ? 'recommended' : ''
+                  }" data-action="primary_work">
                     <div class="action-title">
                       <span>ヘルメット ${divDef.primaryKpi.actionLabel}</span>
-                      <span class="action-tag">主KPI +${perPrimaryGain} ${divDef.primaryKpi.unit}</span>
+                      <span class="action-tag ${pDone ? 'done-tag' : ''}">
+                        ${rec.actionId === 'primary_work' ? '★ 推薦｜' : ''}主KPI +${perPrimaryGain} ${divDef.primaryKpi.unit}
+                      </span>
                     </div>
                     <div class="action-desc">${divDef.primaryKpi.actionDesc}</div>
                   </button>
-                  <button class="action-card" data-action="secondary_work">
+                  <button class="action-card ${
+                    rec.actionId === 'secondary_work' ? 'recommended' : ''
+                  }" data-action="secondary_work">
                     <div class="action-title">
                       <span>📁 ${divDef.secondaryKpi.actionLabel}</span>
-                      <span class="action-tag">次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}</span>
+                      <span class="action-tag ${sDone ? 'done-tag' : ''}">
+                        ${rec.actionId === 'secondary_work' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}
+                      </span>
                     </div>
                     <div class="action-desc">${divDef.secondaryKpi.actionDesc}</div>
                   </button>
@@ -471,12 +415,16 @@ function renderMainGame(state: GameState) {
             ${
               state.player.blockedSlots === 0 && canStudy
                 ? `
-                <button class="action-card study" data-action="slack_study">
+                <button class="action-card study ${
+                  rec.actionId === 'slack_study' ? 'recommended' : ''
+                }" data-action="slack_study">
                   <div class="action-title">
-                    <span>📖 偷懶看書（備戰國考）</span>
-                    <span class="action-tag">負壓 -3 / 提升上榜率</span>
+                    <span>📖 偷懶看書（準備國考）</span>
+                    <span class="action-tag">
+                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}提升上榜率（不降壓）
+                    </span>
                   </div>
-                  <div class="action-desc">不會被主管抓包，但本時段無任何業務產出。秘密提升國考上榜率（考上才重置）。</div>
+                  <div class="action-desc">不會被抓，秘密提升國考上榜率（考上才重置），但本時段無 KPI 產出且不消除負壓。</div>
                 </button>`
                 : ''
             }
@@ -484,34 +432,169 @@ function renderMainGame(state: GameState) {
             ${
               state.player.blockedSlots === 0
                 ? `
-                <button class="action-card" data-action="relax_idle">
+                <button class="action-card ${
+                  rec.actionId === 'relax_idle' ? 'recommended' : ''
+                }" data-action="relax_idle">
                   <div class="action-title">
                     <span>☕ 茶水間摸魚喘息</span>
-                    <span class="action-tag">負壓 -8</span>
+                    <span class="action-tag">
+                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10
+                    </span>
                   </div>
-                  <div class="action-desc">暫時放下公文與法條放空喘口氣，快速緩解情緒負壓，但無業務產出。</div>
+                  <div class="action-desc">泡咖啡滑手機放空，快速消除 10 點情緒負壓（本時段無 KPI 產出）。</div>
                 </button>
-                <button class="action-card" data-action="take_leave" ${
-                  state.player.annualLeaveLeft <= 0 ? 'disabled' : ''
-                }>
+                <button class="action-card ${
+                  rec.actionId === 'take_leave' ? 'recommended' : ''
+                }" data-action="take_leave" ${
+                    state.player.annualLeaveLeft <= 0 ? 'disabled' : ''
+                  }>
                   <div class="action-title">
-                    <span>🌴 請休半天特休假（剩 ${state.player.annualLeaveLeft} 格）</span>
-                    <span class="action-tag">負壓 -15</span>
+                    <span>🌴 請休特休假（剩 ${state.player.annualLeaveLeft} 格）</span>
+                    <span class="action-tag">
+                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -18
+                    </span>
                   </div>
-                  <div class="action-desc">大幅降低情緒負壓 15 點，但注意：請休特休假<strong>不會調降本月績效目標</strong>！</div>
+                  <div class="action-desc">大幅消除 18 點情緒負壓，但注意：請特休<strong>不會調降本月 KPI 目標</strong>！</div>
                 </button>`
                 : ''
             }
           </div>
         </div>
 
-        <!-- Official Work Log -->
-        <div class="panel-box">
-          <div class="panel-heading">
-            <span>📜 職務差勤與事件紀錄簿</span>
-            <span style="font-size:0.78rem; color:var(--ink-muted);">最新紀錄置頂</span>
+        <!-- 4. Live Field Inspection / Action Feedback Card (Immediate Narrative Reward!) -->
+        ${
+          fb
+            ? `
+          <div class="feedback-showcase ${fb.tone}">
+            <div class="feedback-header">
+              <span class="feedback-badge">📢 最新現場稽查與行動回報（${fb.timeLabel}）</span>
+              <strong>${fb.actionTitle}</strong>
+            </div>
+            ${fb.site ? `<div class="feedback-site">📍 ${fb.site}</div>` : ''}
+            <div class="feedback-detail">${fb.detail}</div>
+            ${fb.finding ? `<div class="feedback-finding">${fb.finding}</div>` : ''}
+            <div class="feedback-impact">📊 結算影響：${fb.impactSummary}</div>
+          </div>`
+            : ''
+        }
+
+        <!-- 5. Clean Progress Dashboard (KPI + Stress + Exam) -->
+        <div class="dashboard-grid">
+          <!-- Left: Monthly KPI Progress -->
+          <div class="panel-box">
+            <div class="panel-heading">
+              <span>📊 本月（${state.time.month}月）績效目標進度</span>
+              <span style="font-size:0.78rem; color:var(--ink-secondary);">
+                ${
+                  state.kpi.isTrainingMonth
+                    ? '職前訓練月免計KPI'
+                    : `本月剩 ${slotsLeft} 格時段`
+                }
+              </span>
+            </div>
+
+            <div class="meter-group">
+              <div class="meter-top">
+                <span>1. ${divDef.primaryKpi.label} ${pDone ? '✅ 已達標' : ''}</span>
+                <strong>${state.kpi.primaryProgress} / ${state.kpi.primaryTarget} ${divDef.primaryKpi.unit}</strong>
+              </div>
+              <div class="meter-track">
+                <div class="meter-fill ${pDone ? 'kpi-done' : 'kpi'}" style="width: ${pPct}%"></div>
+              </div>
+            </div>
+
+            <div class="meter-group">
+              <div class="meter-top">
+                <span>2. ${divDef.secondaryKpi.label} ${sDone ? '✅ 已達標' : ''}</span>
+                <strong>${state.kpi.secondaryProgress} / ${state.kpi.secondaryTarget} ${divDef.secondaryKpi.unit}</strong>
+              </div>
+              <div class="meter-track">
+                <div class="meter-fill ${sDone ? 'kpi-done' : 'kpi'}" style="width: ${sPct}%"></div>
+              </div>
+            </div>
+
+            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-doc); font-size:0.84rem;">
+              <div style="display:flex; justify-content:space-between;">
+                <span>半年度考評容錯（累計 3 個月未達標即開除）：</span>
+                <strong style="color:${
+                  state.halfYearFailedMonths >= 2 ? 'var(--seal-red)' : 'var(--ink-primary)'
+                }">已未達標 ${state.halfYearFailedMonths} / 3 個月</strong>
+              </div>
+              <div class="halfyear-pills">
+                ${
+                  state.halfYearMonthResults.length === 0
+                    ? '<span style="font-size:0.78rem; color:var(--ink-muted);">本半年尚無已結算月份</span>'
+                    : state.halfYearMonthResults
+                        .map(
+                          (m) =>
+                            `<span class="month-pill ${m.passed ? 'pass' : 'fail'}">${m.month}月${
+                              m.exempt ? '免計' : m.passed ? '✓達標' : '✗未達標'
+                            }</span>`
+                        )
+                        .join('')
+                }
+              </div>
+            </div>
           </div>
-          <div class="log-list">
+
+          <!-- Right: Stress & National Exam -->
+          <div class="panel-box">
+            <div class="panel-heading">
+              <span>🧠 情緒負壓與國考進度</span>
+              <span style="font-size:0.78rem; color:${
+                penaltyActive ? 'var(--seal-red)' : 'var(--ink-secondary)'
+              }; font-weight:700;">
+                ${penaltyActive ? '⚠️ 負壓≥70：工作產出減半！' : '每週自然恢復 -1'}
+              </span>
+            </div>
+
+            <div class="meter-group">
+              <div class="meter-top">
+                <span>情緒負壓（每次工作 +5～+6｜滿 70 減半｜滿 100 過勞結局）</span>
+                <strong style="color:${
+                  state.player.stress >= 70 ? 'var(--seal-red)' : 'inherit'
+                }">${state.player.stress} / 100</strong>
+              </div>
+              <div class="meter-track">
+                <div class="meter-fill ${stressClass}" style="width: ${state.player.stress}%"></div>
+              </div>
+            </div>
+
+            <div class="officer-strip" style="margin-bottom: 0; padding: 10px;">
+              <div class="officer-cell">
+                <span class="officer-label">國考讀書把握度</span>
+                <span class="officer-value" style="font-size:0.86rem;">${getStudyReadinessHint(state)}</span>
+              </div>
+              <div class="officer-cell">
+                <span class="officer-label">下次強制國考</span>
+                <span class="officer-value" style="font-size:0.86rem;">${nextExamText}</span>
+              </div>
+              <div class="officer-cell">
+                <span class="officer-label">目前職級進度</span>
+                <span class="officer-value" style="font-size:0.86rem;">${rankDef.title} (Lv.${rankDef.level + 1}/8)</span>
+              </div>
+              <div class="officer-cell">
+                <span class="officer-label">長官好感 / 聲望</span>
+                <span class="officer-value" style="font-size:0.86rem;">${state.player.bossFavor} / ${state.player.reputation}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 6. Collapsible History Log & Career Ladder -->
+        <details class="panel-box" style="margin-top: 10px;">
+          <summary style="cursor:pointer; font-weight:700; font-family:'Noto Serif TC', serif;">
+            📜 展開歷史差勤紀錄簿（共 ${state.logs.length} 筆）與完整職級階梯
+          </summary>
+          <div style="margin: 10px 0; padding: 8px; background: var(--bg-paper-alt); border-radius: 4px; font-size: 0.8rem;">
+            <strong>升遷階梯：</strong>
+            ${RANKS.map((r) =>
+              r.id === state.player.rankId
+                ? `<strong style="color:var(--seal-red);">【${r.title}】</strong>`
+                : r.title
+            ).join(' → ')}
+          </div>
+          <div class="log-list" style="margin-top: 10px;">
             ${state.logs
               .map(
                 (item) => `
@@ -522,7 +605,7 @@ function renderMainGame(state: GameState) {
               )
               .join('')}
           </div>
-        </div>
+        </details>
       </div>
 
       ${renderActiveModalHtml(state)}
@@ -617,7 +700,7 @@ function renderActiveModalHtml(state: GameState): string {
     return `
       <div class="modal-backdrop">
         <div class="modal-doc">
-          <div class="modal-stamp">突發狀況通報</div>
+          <div class="modal-stamp">🚨 突發狀況通報</div>
           <h3 class="modal-title">${modal.event.title}</h3>
           <div class="modal-body">${modal.event.text}</div>
           <div class="choice-stack">

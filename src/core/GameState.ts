@@ -120,6 +120,16 @@ export interface HalfYearRecord {
   rankAtReview: RankId;
 }
 
+export interface LatestFeedback {
+  timeLabel: string;
+  actionTitle: string;
+  site?: string;
+  detail: string;
+  finding?: string;
+  impactSummary: string;
+  tone: 'info' | 'good' | 'warn' | 'bad';
+}
+
 export interface GameState {
   version: number;
   rngState: number;
@@ -161,6 +171,7 @@ export interface GameState {
   reviews: HalfYearRecord[];
   pendingExam: PendingExamResult | null;
   activeModal: ActiveModal | null;
+  lastFeedback?: LatestFeedback | null;
   logs: LogEntry[];
   endingId: string | null;
 }
@@ -272,6 +283,14 @@ export function createInitialGameState(
     reviews: [],
     pendingExam: null,
     activeModal: null,
+    lastFeedback: {
+      timeLabel: '民國116年1月第1週 上午',
+      actionTitle: '新進人員報到與職前訓練啟動',
+      site: `北辰市勞動檢查處・${getDivisionDef(divisionId).name}`,
+      detail: '人事室發下勞動檢查證與法規彙編，1月份為職前專業訓練月（免計KPI），請點擊下方行動按鈕開始推進每個上下午時段！',
+      impactSummary: '提示：1月份可全力點選「偷懶看書」衝刺7月高考把握度',
+      tone: 'info',
+    },
     logs: [
       {
         timeLabel: '民國116年1月第1週 上午',

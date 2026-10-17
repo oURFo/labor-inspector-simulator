@@ -14,6 +14,7 @@ import {
 import { createRng, Rng } from './rng';
 import eventsData from '../data/events.json';
 import endingsData from '../data/endings.json';
+import vignettesData from '../data/vignettes.json';
 
 export const EVENTS = eventsData as GameEvent[];
 export const ENDINGS = endingsData as {
@@ -170,8 +171,8 @@ export function isCurrentMonthKpiPassed(state: GameState): boolean {
 
 function rollRandomEvent(state: GameState, rng: Rng): GameEvent | null {
   if (state.kpi.isTrainingMonth) return null;
-  // Base 18% chance per slot
-  if (rng.next() >= 0.18) return null;
+  // Base 36% chance per slot (doubled from 18% per user request)
+  if (rng.next() >= 0.36) return null;
 
   const rankLevel = getRankDef(state.player.rankId).level;
   const eligible = EVENTS.filter((ev) => {
@@ -206,9 +207,17 @@ export function executeActionEffect(
 ): void {
   const div = getDivisionDef(state.player.divisionId);
   const mult = effectOverride?.outputMultiplier ?? 1;
+  const tLabel = formatTimeLabel(state);
 
   if (effectOverride?.cancelCurrentSlot) {
     // Slot was consumed by interrupting event
+    state.lastFeedback = {
+      timeLabel: tLabel,
+      actionTitle: '🚨 原定行程遭突發事件打斷',
+      detail: effectOverride.log ?? '本時段因處理緊急突發事件，原定工作無法執行。',
+      impactSummary: `本時段無常規進度產出｜目前情緒負壓 ${state.player.stress}/100`,
+      tone: 'warn',
+    };
     return;
   }
 
@@ -219,10 +228,22 @@ export function executeActionEffect(
           ? effectOverride.overridePrimaryGain
           : getEffectiveActionOutput(state, div.primaryKpi.perAction, mult);
       state.kpi.primaryProgress += gain;
-      addStress(state, 1);
+      addStress(state, 5);
+
+      const pool = vignettesData.primaryWork[state.player.divisionId];
+      const v = rng.pick(pool);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: `ヘルメット ${div.primaryKpi.actionLabel}`,
+        site: `受檢單位：${v.site}`,
+        detail: v.detail,
+        finding: `📋 稽查處置：${v.finding}`,
+        impactSummary: `${div.primaryKpi.label} +${gain} ${div.primaryKpi.unit}（本月累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}）｜情緒負壓 +5`,
+        tone: 'info',
+      };
       addLog(
         state,
-        `執行【${div.primaryKpi.actionLabel}】，完成 ${gain} ${div.primaryKpi.unit}（累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}）。`,
+        `【${v.site}】${v.detail} ${v.finding}（+${gain}${div.primaryKpi.unit}，累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}，負壓 +5）`,
         'info'
       );
       break;
@@ -230,10 +251,21 @@ export function executeActionEffect(
     case 'secondary_work': {
       const gain = getEffectiveActionOutput(state, div.secondaryKpi.perAction, mult);
       state.kpi.secondaryProgress += gain;
-      addStress(state, 1);
+      addStress(state, 6);
+
+      const pool = vignettesData.secondaryWork[state.player.divisionId];
+      const story = rng.pick(pool);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: `📁 ${div.secondaryKpi.actionLabel}`,
+        site: `承辦業務：${div.secondaryKpi.label}`,
+        detail: story,
+        impactSummary: `${div.secondaryKpi.label} +${gain} ${div.secondaryKpi.unit}（本月累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}）｜情緒負壓 +6`,
+        tone: 'info',
+      };
       addLog(
         state,
-        `執行【${div.secondaryKpi.actionLabel}】，完成 ${gain} ${div.secondaryKpi.unit}（累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}）。`,
+        `【${div.secondaryKpi.actionLabel}】${story}（+${gain}${div.secondaryKpi.unit}，累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}，負壓 +6）`,
         'info'
       );
       break;
@@ -241,26 +273,49 @@ export function executeActionEffect(
     case 'slack_study': {
       const bonus = rng.nextInt(1, 3);
       state.player.examBonus = clamp(state.player.examBonus + bonus, 0, 55);
-      addStress(state, -3);
+      // Removed stress relief per user request! Studying does NOT reduce stress.
+      const story = rng.pick(vignettesData.slackStudy);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: '📖 偷閒苦讀國考科目',
+        detail: story,
+        impactSummary: `國考上榜把握度提升（${getStudyReadinessHint(state)}）｜本時段無業務產出｜情緒負壓不變`,
+        tone: 'good',
+      };
       addLog(
         state,
-        `利用公出空檔與辦公桌掩護【偷懶看書】，精讀法科講義，情緒負壓 -3，對國考更有把握了！`,
+        `【偷閒看書】${story}（國考準備度提升，本時段無KPI產出）`,
         'good'
       );
       break;
     }
     case 'relax_idle': {
-      addStress(state, -8);
-      addLog(state, `在茶水間泡咖啡、滑手機【摸魚喘息】，情緒負壓 -8。`, 'good');
+      addStress(state, -10);
+      const story = rng.pick(vignettesData.relaxIdle);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: '☕ 茶水間摸魚放空',
+        detail: story,
+        impactSummary: `情緒負壓 -10（目前 ${state.player.stress}/100）｜本時段無業務產出`,
+        tone: 'good',
+      };
+      addLog(state, `【摸魚喘息】${story}（情緒負壓 -10）`, 'good');
       break;
     }
     case 'take_leave': {
       if (state.player.annualLeaveLeft > 0) {
         state.player.annualLeaveLeft -= 1;
-        addStress(state, -15);
+        addStress(state, -18);
+        state.lastFeedback = {
+          timeLabel: tLabel,
+          actionTitle: '🌴 請休半天特休假',
+          detail: '你關掉公務機群組通知，徹底遠離工地噪音與刁民申訴電話，睡到自然醒後去吃了頓大餐。',
+          impactSummary: `情緒負壓 -18（剩餘特休 ${state.player.annualLeaveLeft} 格，注意：本月 KPI 目標不變）`,
+          tone: 'good',
+        };
         addLog(
           state,
-          `請休半天特休假（剩餘 ${state.player.annualLeaveLeft} 格），徹底遠離公文與工地，情緒負壓 -15（注意：本月績效目標不變）。`,
+          `【請休特休假】關掉公務機徹底休息半天（剩餘 ${state.player.annualLeaveLeft} 格），情緒負壓 -18（本月績效目標不變）。`,
           'good'
         );
       }
@@ -270,10 +325,18 @@ export function executeActionEffect(
       const gain = getEffectiveActionOutput(state, div.primaryKpi.perAction, mult * 1.25);
       state.kpi.primaryProgress += gain;
       state.player.bossFavor = clamp(state.player.bossFavor + 2, 0, 100);
-      addStress(state, 2);
+      addStress(state, 5);
+      const story = rng.pick(vignettesData.mgmtSupervise);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: '📋 督導科室專案稽查',
+        detail: story,
+        impactSummary: `科室主KPI +${gain} ${div.primaryKpi.unit}（累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}）｜長官好感 +2｜情緒負壓 +5`,
+        tone: 'info',
+      };
       addLog(
         state,
-        `執行【督導科室專案稽查】，統籌下屬推進 ${gain} ${div.primaryKpi.unit}進度，長官好感 +2。`,
+        `【督導專案稽查】${story}（+${gain}${div.primaryKpi.unit}，長官好感 +2，負壓 +5）`,
         'info'
       );
       break;
@@ -282,10 +345,18 @@ export function executeActionEffect(
       const gain = getEffectiveActionOutput(state, div.secondaryKpi.perAction, mult);
       state.kpi.secondaryProgress += gain;
       state.player.reputation = clamp(state.player.reputation + 2, 0, 100);
-      addStress(state, 1);
+      addStress(state, 5);
+      const story = rng.pick(vignettesData.mgmtCoord);
+      state.lastFeedback = {
+        timeLabel: tLabel,
+        actionTitle: '🏛️ 主持跨局處與專案協調會',
+        detail: story,
+        impactSummary: `次要KPI +${gain} ${div.secondaryKpi.unit}（累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}）｜社會聲望 +2｜情緒負壓 +5`,
+        tone: 'info',
+      };
       addLog(
         state,
-        `主持【跨局處與專案協調會】，完成 ${gain} ${div.secondaryKpi.unit}專案指標，社會聲望 +2。`,
+        `【主持專案協調】${story}（+${gain}${div.secondaryKpi.unit}，社會聲望 +2，負壓 +5）`,
         'info'
       );
       break;
