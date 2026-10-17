@@ -221,6 +221,10 @@ export function executeActionEffect(
     return;
   }
 
+  if (!state.kpi.highlightCases) {
+    state.kpi.highlightCases = [];
+  }
+
   switch (actionId) {
     case 'primary_work': {
       const gain =
@@ -232,6 +236,7 @@ export function executeActionEffect(
 
       const pool = vignettesData.primaryWork[state.player.divisionId];
       const v = rng.pick(pool);
+      state.kpi.highlightCases.push(`【${v.site}】${v.finding}（+${gain}${div.primaryKpi.unit}）`);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: `ヘルメット ${div.primaryKpi.actionLabel}`,
@@ -255,6 +260,7 @@ export function executeActionEffect(
 
       const pool = vignettesData.secondaryWork[state.player.divisionId];
       const story = rng.pick(pool);
+      state.kpi.highlightCases.push(`【${div.secondaryKpi.label}】${story}`);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: `📁 ${div.secondaryKpi.actionLabel}`,
@@ -327,6 +333,7 @@ export function executeActionEffect(
       state.player.bossFavor = clamp(state.player.bossFavor + 2, 0, 100);
       addStress(state, 5);
       const story = rng.pick(vignettesData.mgmtSupervise);
+      state.kpi.highlightCases.push(`【督導稽查】${story}（+${gain}${div.primaryKpi.unit}）`);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: '📋 督導科室專案稽查',
@@ -347,6 +354,7 @@ export function executeActionEffect(
       state.player.reputation = clamp(state.player.reputation + 2, 0, 100);
       addStress(state, 5);
       const story = rng.pick(vignettesData.mgmtCoord);
+      state.kpi.highlightCases.push(`【跨局處協調】${story}（+${gain}${div.secondaryKpi.unit}）`);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: '🏛️ 主持跨局處與專案協調會',
@@ -571,11 +579,71 @@ function checkExamAnnouncement(state: GameState): void {
   }
 }
 
+function buildSupervisorFeedback(
+  state: GameState,
+  passed: boolean,
+  isTrainingMonth: boolean,
+  rng: Rng
+): { supervisorTitle: string; supervisorComment: string } {
+  const rank = state.player.rankId;
+  const div = getDivisionDef(state.player.divisionId);
+
+  let supervisorTitle = `${div.name} 科長`;
+  if (rank === 'chief') {
+    supervisorTitle = '北辰市勞動檢查處 副處長';
+  } else if (rank === 'deputy_director') {
+    supervisorTitle = '北辰市勞動檢查處 處長';
+  } else if (rank === 'director') {
+    supervisorTitle = '北辰市政府 勞動局局長';
+  }
+
+  if (isTrainingMonth) {
+    return {
+      supervisorTitle,
+      supervisorComment: `「${state.player.name}，這個月的新人職前法規與實務訓練表現很穩定。從下個月（2月）開始就要正式揹負科室的稽查場次與申訴案KPI了，去現場遇到慣老闆態度硬一點，但也別忘了注意自身安全！」`,
+    };
+  }
+
+  if (passed) {
+    const passComments = [
+      `「${state.player.name}，這個月的檢查場次跟專案結案數都如期達標，處分書寫得也很紮實，沒被法制室退件。繼續保持這個節奏，年底考績我會替你爭取！」`,
+      `「幹得好！這個月轄區幾件棘手的案子你都處理得很俐落，連主任秘書在處務會議上都特別點名表揚我們${div.name}，辛苦了！」`,
+      `「看你的差勤跟稽查紀錄，每週進度都抓得很穩。公家機關就是這樣，先把長官要的KPI數字交出來，剩下的時間你要看書進修或喘口氣，我絕對不會干涉你。」`,
+    ];
+    return {
+      supervisorTitle,
+      supervisorComment: rng.pick(passComments),
+    };
+  } else {
+    const fails = state.halfYearFailedMonths;
+    const failComments = [
+      `「${state.player.name}！你看看這個月的統計報表，檢查場次跟結案數雙雙落後！上面催辦單已經壓下來了，你這半年已經累計 ${fails} 個月沒達標，滿 3 個月連我也保不住你！」`,
+      `「怎麼回事？這個月外出稽查的場次明顯不夠，積案都堆在辦公桌上了！我知道現場突發狀況多，但績效數字是死規定，下個月務必給我補上來！」`,
+      `「人事室剛剛把月度管考紅單送到我桌上。你這半年已經有 ${fails}/3 個月未達標，再這樣下去半年考評會直接被送考績會汰除，自己繃緊神經！」`,
+    ];
+    return {
+      supervisorTitle,
+      supervisorComment: rng.pick(failComments),
+    };
+  }
+}
+
 function processEndOfMonth(state: GameState, rng: Rng): void {
+  const rocYear = 115 + state.time.year;
+  const monthEnded = state.time.month;
+  const div = getDivisionDef(state.player.divisionId);
+  const wasTrainingMonth = state.kpi.isTrainingMonth;
+  const pProg = state.kpi.primaryProgress;
+  const pTarg = state.kpi.primaryTarget;
+  const sProg = state.kpi.secondaryProgress;
+  const sTarg = state.kpi.secondaryTarget;
+  const cases = [...(state.kpi.highlightCases ?? [])];
+
   // 1. Evaluate monthly KPI
-  if (state.kpi.isTrainingMonth) {
+  let passed = true;
+  if (wasTrainingMonth) {
     state.halfYearMonthResults.push({
-      month: state.time.month,
+      month: monthEnded,
       passed: true,
       exempt: true,
     });
@@ -585,9 +653,9 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
       'info'
     );
   } else {
-    const passed = isCurrentMonthKpiPassed(state);
+    passed = isCurrentMonthKpiPassed(state);
     state.halfYearMonthResults.push({
-      month: state.time.month,
+      month: monthEnded,
       passed,
     });
     if (passed) {
@@ -595,7 +663,7 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
       state.player.bossFavor = clamp(state.player.bossFavor + 2, 0, 100);
       addLog(
         state,
-        `【${state.time.month}月績效結算：達標】主次要 KPI 皆達成 100%，情緒負壓 -3，長官好感 +2。`,
+        `【${monthEnded}月績效結算：達標】主次要 KPI 皆達成 100%，情緒負壓 -3，長官好感 +2。`,
         'good'
       );
     } else {
@@ -604,11 +672,19 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
       state.player.bossFavor = clamp(state.player.bossFavor - 4, 0, 100);
       addLog(
         state,
-        `【${state.time.month}月績效結算：未達標】檢查進度落後（本半年累計未達標 ${state.halfYearFailedMonths}/3 個月），情緒負壓 +8！`,
+        `【${monthEnded}月績效結算：未達標】檢查進度落後（本半年累計未達標 ${state.halfYearFailedMonths}/3 個月），情緒負壓 +8！`,
         'bad'
       );
     }
   }
+
+  const { supervisorTitle, supervisorComment } = buildSupervisorFeedback(
+    state,
+    passed,
+    wasTrainingMonth,
+    rng
+  );
+  const halfYearFailedSnapshot = state.halfYearFailedMonths;
 
   // 2. Corruption investigation check (monthly chance = corruption / 2 %)
   if (!state.endingId && state.player.corruption > 0) {
@@ -646,8 +722,38 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
   }
 
   // 4. Half-year review at end of June (month 6) and December (month 12)
-  if (!state.endingId && (state.time.month === 6 || state.time.month === 12)) {
-    processHalfYearReview(state, rng);
+  let halfYearSummary: string | undefined;
+  if (!state.endingId && (monthEnded === 6 || monthEnded === 12)) {
+    halfYearSummary = processHalfYearReview(state, rng);
+  }
+
+  // 5. Create monthly settlement report modal (if game hasn't ended)
+  if (!state.endingId) {
+    state.activeModal = {
+      type: 'monthly_report',
+      title: `📋 民國${rocYear}年${monthEnded}月份 業務績效結算考評表`,
+      body: supervisorComment,
+      monthlyReport: {
+        rocYear,
+        month: monthEnded,
+        divisionName: div.name,
+        isTrainingMonth: wasTrainingMonth,
+        passed,
+        primaryLabel: div.primaryKpi.label,
+        primaryProgress: pProg,
+        primaryTarget: pTarg,
+        primaryUnit: div.primaryKpi.unit,
+        secondaryLabel: div.secondaryKpi.label,
+        secondaryProgress: sProg,
+        secondaryTarget: sTarg,
+        secondaryUnit: div.secondaryKpi.unit,
+        highlightCases: cases.slice(-6),
+        supervisorTitle,
+        supervisorComment,
+        halfYearFailedMonths: halfYearFailedSnapshot,
+        halfYearSummary,
+      },
+    };
   }
 }
 
@@ -658,7 +764,7 @@ function assignRandomDivisionOnPromotion(state: GameState, rng: Rng): DivisionId
   return rng.pick(others);
 }
 
-function processHalfYearReview(state: GameState, rng: Rng): void {
+function processHalfYearReview(state: GameState, rng: Rng): string | undefined {
   const rocYear = 115 + state.time.year;
   const halfLabel = state.time.month === 6 ? '上半年' : '下半年';
   const periodLabel = `民國${rocYear}年${halfLabel}`;
@@ -677,7 +783,7 @@ function processHalfYearReview(state: GameState, rng: Rng): void {
       `【${periodLabel}考評：汰除】半年內累計 ${fails} 個月績效未達標（達半數以上），移送考績會決議不予續任／免職！`,
       'bad'
     );
-    return;
+    return undefined;
   }
 
   const grade: '優' | '甲' | '乙' = fails === 0 ? '優' : fails === 1 ? '甲' : '乙';
@@ -688,41 +794,40 @@ function processHalfYearReview(state: GameState, rng: Rng): void {
     rankAtReview: state.player.rankId,
   });
 
+  let summary = '';
   if (grade === '優') {
     state.player.totalExcellentGrades += 1;
     addStress(state, -10);
-    addLog(
-      state,
-      `🏅【${periodLabel}考核：優等】半年度全數達標！獲處長嘉獎，情緒負壓 -10。`,
-      'good'
-    );
+    summary = `🏅【${periodLabel}半年度考評：優等】6個月全數達標！獲處長公開嘉獎，情緒負壓 -10。`;
+    addLog(state, summary, 'good');
   } else if (grade === '甲') {
-    addLog(
-      state,
-      `【${periodLabel}考核：甲等】半年度僅 1 個月未達標，考評甲等，符合升遷採計資格。`,
-      'info'
-    );
+    summary = `✅【${periodLabel}半年度考評：甲等】半年內僅 1 個月未達標，考評甲等，符合升遷採計資格。`;
+    addLog(state, summary, 'info');
   } else {
     // 乙等 (2 months failed): Option B -> no promotion + boss interview (+15 stress)
     state.player.chiefGoodReviews = 0;
     addStress(state, 15);
-    addLog(
-      state,
-      `⚠️【${periodLabel}考核：乙等】半年內有 2 個月未達標，遭科長與主任秘書嚴厲約談（情緒負壓 +15），本季不得升遷！`,
-      'warn'
-    );
+    summary = `⚠️【${periodLabel}半年度考評：乙等】半年內有 2 個月未達標，遭科長與主任秘書嚴厲約談（情緒負壓 +15），本季不得升遷！`;
+    addLog(state, summary, 'warn');
   }
 
-  if (state.endingId) return;
+  if (state.endingId) return summary;
 
   // Check promotion eligibility if grade is 優 or 甲
+  const rankBefore = state.player.rankId;
   if (grade === '優' || grade === '甲') {
     tryPromotePlayer(state, rng);
+  }
+  if (state.player.rankId !== rankBefore) {
+    const newRankDef = getRankDef(state.player.rankId);
+    const newDivDef = getDivisionDef(state.player.divisionId);
+    summary += `\n🎊【人事升遷派令】恭賀榮升「${newRankDef.title}（${newRankDef.grade}）」，並輪調至【${newDivDef.name}】！`;
   }
 
   // Reset half-year counters
   state.halfYearFailedMonths = 0;
   state.halfYearMonthResults = [];
+  return summary;
 }
 
 function tryPromotePlayer(state: GameState, rng: Rng): void {
@@ -838,6 +943,7 @@ export function advanceClockOneSlot(state: GameState, rng: Rng): void {
     // End of year
     if (state.time.year >= 5) {
       // 5 years completed! Determine final ending
+      state.activeModal = null;
       resolveFiveYearEnding(state);
       return;
     }
@@ -886,6 +992,12 @@ export function resolveFiveYearEnding(state: GameState): void {
 /**
  * Main entry point when the player clicks an action button for the current slot.
  */
+function clearMonthlyReportIfAuto(state: GameState, autoResolveEvents: boolean): void {
+  if (autoResolveEvents && state.activeModal?.type === 'monthly_report') {
+    state.activeModal = null;
+  }
+}
+
 export function performSlotAction(
   state: GameState,
   actionId: ActionId,
@@ -903,6 +1015,7 @@ export function performSlotAction(
       'info'
     );
     advanceClockOneSlot(state, rng);
+    clearMonthlyReportIfAuto(state, autoResolveEvents);
     state.rngState = rng.getState();
     return;
   }
@@ -915,27 +1028,31 @@ export function performSlotAction(
       state.activeModal = null;
       conductExam(state, 'local_3', rng);
       advanceClockOneSlot(state, rng);
+      clearMonthlyReportIfAuto(state, autoResolveEvents);
       state.rngState = rng.getState();
     } else if (!state.activeModal) {
       // Exam conducted immediately (e.g., July High Exam) -> advance this slot
       advanceClockOneSlot(state, rng);
+      clearMonthlyReportIfAuto(state, autoResolveEvents);
       state.rngState = rng.getState();
     }
     return;
   }
 
-  // 3. Roll random event
-  const ev = rollRandomEvent(state, rng);
+  // 3. Roll random event ONLY if action is NOT relax_idle (摸魚) and NOT take_leave (請假)
+  const isStressReliefAction = actionId === 'relax_idle' || actionId === 'take_leave';
+  const ev = isStressReliefAction ? null : rollRandomEvent(state, rng);
   if (ev) {
     if (autoResolveEvents) {
       const choice = ev.choices[0];
       applyEventChoiceEffects(state, choice.effects);
-      if (! state.endingId) {
+      if (!state.endingId) {
         executeActionEffect(state, actionId, rng, choice.effects);
       }
       if (!state.endingId) {
         advanceClockOneSlot(state, rng);
       }
+      clearMonthlyReportIfAuto(state, autoResolveEvents);
       state.rngState = rng.getState();
       return;
     } else {
@@ -956,6 +1073,7 @@ export function performSlotAction(
   if (!state.endingId) {
     advanceClockOneSlot(state, rng);
   }
+  clearMonthlyReportIfAuto(state, autoResolveEvents);
   state.rngState = rng.getState();
 }
 
@@ -963,6 +1081,11 @@ export function resolveActiveModalChoice(state: GameState, choiceIndex: number):
   const modal = state.activeModal;
   if (!modal) return;
   const rng = createRng(state.rngState);
+
+  if (modal.type === 'monthly_report') {
+    state.activeModal = null;
+    return;
+  }
 
   if (modal.type === 'exam_choice') {
     state.activeModal = null;

@@ -42,6 +42,8 @@ export interface MonthlyKpiState {
   officialLeaveSlots: number;
   /** Whether this month is exempt from KPI (Year 1 Month 1 new-hire training) */
   isTrainingMonth: boolean;
+  /** Highlight cases handled this month for the end-of-month settlement report */
+  highlightCases?: string[];
 }
 
 export interface PendingExamResult {
@@ -89,11 +91,33 @@ export interface GameEvent {
   choices: GameEventChoice[];
 }
 
+export interface MonthlyReportData {
+  rocYear: number;
+  month: number;
+  divisionName: string;
+  isTrainingMonth: boolean;
+  passed: boolean;
+  primaryLabel: string;
+  primaryProgress: number;
+  primaryTarget: number;
+  primaryUnit: string;
+  secondaryLabel: string;
+  secondaryProgress: number;
+  secondaryTarget: number;
+  secondaryUnit: string;
+  highlightCases: string[];
+  supervisorTitle: string;
+  supervisorComment: string;
+  halfYearFailedMonths: number;
+  halfYearSummary?: string;
+}
+
 export interface ActiveModal {
-  type: 'onboarding' | 'event' | 'exam_choice' | 'review' | 'promotion' | 'notice';
+  type: 'onboarding' | 'event' | 'exam_choice' | 'monthly_report' | 'review' | 'promotion' | 'notice';
   title: string;
   body: string;
   event?: GameEvent;
+  monthlyReport?: MonthlyReportData;
   /** Pending action ID that was interrupted or triggered before/with event */
   pendingActionId?: ActionId;
 }
@@ -238,6 +262,7 @@ export function computeInitialMonthlyKpi(
     secondaryProgress: 0,
     officialLeaveSlots: 0,
     isTrainingMonth,
+    highlightCases: [],
   };
 }
 

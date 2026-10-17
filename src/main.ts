@@ -438,10 +438,10 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>☕ 茶水間摸魚喘息</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10
+                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10（免突發事件）
                     </span>
                   </div>
-                  <div class="action-desc">泡咖啡滑手機放空，快速消除 10 點情緒負壓（本時段無 KPI 產出）。</div>
+                  <div class="action-desc">泡咖啡滑手機放空，快速消除 10 點情緒負壓（<strong>保證不會觸發突發事件</strong>，但無 KPI 產出）。</div>
                 </button>
                 <button class="action-card ${
                   rec.actionId === 'take_leave' ? 'recommended' : ''
@@ -451,10 +451,10 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>🌴 請休特休假（剩 ${state.player.annualLeaveLeft} 格）</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -18
+                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -18（免突發事件）
                     </span>
                   </div>
-                  <div class="action-desc">大幅消除 18 點情緒負壓，但注意：請特休<strong>不會調降本月 KPI 目標</strong>！</div>
+                  <div class="action-desc">大幅消除 18 點負壓且<strong>保證不被突發事件打斷</strong>（注意：不會調降本月 KPI 目標）。</div>
                 </button>`
                 : ''
             }
@@ -690,6 +690,90 @@ function renderActiveModalHtml(state: GameState): string {
           <div class="choice-stack">
             <button class="choice-btn" data-modal-choice="0">🎯 報考【地方特考三等】（跨階應考：錄取後直升薦任技士，一步到位）</button>
             <button class="choice-btn" data-modal-choice="1">📘 報考【地方特考四等】（逐階應考：基礎把握度較高，錄取後任委任技佐）</button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
+  if (modal.type === 'monthly_report' && modal.monthlyReport) {
+    const r = modal.monthlyReport;
+    const statusText = r.isTrainingMonth
+      ? '📘 職前訓練月（免計考評）'
+      : r.passed
+      ? '✅ 本月績效【達標】（負壓 -3，長官好感 +2）'
+      : `❌ 本月績效【未達標】（負壓 +8，本半年已未達標 ${r.halfYearFailedMonths}/3 個月）`;
+
+    const casesHtml =
+      r.highlightCases.length === 0
+        ? '<li style="color:var(--ink-muted);">本月無外勤稽查或專案結案紀錄（皆用於進修或休假調適）</li>'
+        : r.highlightCases.map((c) => `<li>${c}</li>`).join('');
+
+    return `
+      <div class="modal-backdrop">
+        <div class="modal-doc" style="max-width: 680px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:8px;">
+            <span class="modal-stamp">${r.passed ? '月度管考・合格准予備查' : '月度管考・進度落後警告'}</span>
+            <span style="font-size:0.82rem; font-weight:700; color:var(--ink-secondary);">${r.divisionName}</span>
+          </div>
+
+          <h3 class="modal-title">${modal.title}</h3>
+
+          <div style="padding: 10px 14px; border-radius: 5px; margin-bottom: 12px; font-weight: 700; background: ${
+            r.passed ? 'var(--jade-light)' : 'var(--seal-red-light)'
+          }; color: ${r.passed ? 'var(--jade-good)' : 'var(--seal-red)'}; border: 1.5px solid ${
+            r.passed ? 'var(--jade-good)' : 'var(--seal-red)'
+          };">
+            ${statusText}
+          </div>
+
+          <div class="officer-strip" style="margin-bottom: 12px; padding: 10px 12px;">
+            <div class="officer-cell">
+              <span class="officer-label">主要 KPI：${r.primaryLabel}</span>
+              <span class="officer-value">${
+                r.isTrainingMonth
+                  ? '免計'
+                  : `${r.primaryProgress} / ${r.primaryTarget} ${r.primaryUnit} ${
+                      r.primaryProgress >= r.primaryTarget ? '✓' : '✗'
+                    }`
+              }</span>
+            </div>
+            <div class="officer-cell">
+              <span class="officer-label">次要 KPI：${r.secondaryLabel}</span>
+              <span class="officer-value">${
+                r.isTrainingMonth
+                  ? '免計'
+                  : `${r.secondaryProgress} / ${r.secondaryTarget} ${r.secondaryUnit} ${
+                      r.secondaryProgress >= r.secondaryTarget ? '✓' : '✗'
+                    }`
+              }</span>
+            </div>
+          </div>
+
+          <div style="margin-bottom: 12px;">
+            <div style="font-weight:700; font-size:0.9rem; margin-bottom:4px;">📂 本月承辦之具體案件與稽查紀錄：</div>
+            <ul style="padding-left: 20px; font-size: 0.84rem; max-height: 150px; overflow-y: auto; background: var(--bg-paper-alt); padding-top:8px; padding-bottom:8px; border-radius:4px; border:1px solid var(--border-doc); display:flex; flex-direction:column; gap:4px;">
+              ${casesHtml}
+            </ul>
+          </div>
+
+          <div style="padding: 12px 14px; background: var(--gov-navy-light); border-left: 4px solid var(--gov-navy); border-radius: 4px; margin-bottom: 14px;">
+            <div style="font-weight: 700; font-size: 0.86rem; color: var(--gov-navy); margin-bottom: 4px;">
+              🖋️ 直屬上級主管批示（${r.supervisorTitle}）：
+            </div>
+            <div style="font-size: 0.92rem; line-height: 1.6;">${r.supervisorComment}</div>
+          </div>
+
+          ${
+            r.halfYearSummary
+              ? `<div style="padding: 10px 14px; background: var(--amber-light); border-left: 4px solid var(--amber-warn); border-radius: 4px; margin-bottom: 14px; font-weight:700; font-size:0.9rem; white-space:pre-line;">${r.halfYearSummary}</div>`
+              : ''
+          }
+
+          <div class="choice-stack">
+            <button class="choice-btn" data-modal-choice="0" style="text-align:center; background:var(--gov-navy); color:#fff;">
+              ✍️ 閱畢歸檔，進入下個月（${state.time.month}月份）排程
+            </button>
           </div>
         </div>
       </div>

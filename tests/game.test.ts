@@ -133,4 +133,22 @@ describe('Labor Inspector Simulator Core Engine', () => {
     expect(state.player.rankId).toBe('director');
     expect(state.endingId).toBe('true_director');
   });
+
+  it('never triggers random events on relax_idle or take_leave and shows monthly report modal at month end', () => {
+    const state = createInitialGameState('測試員', 'labor_conditions', 2026);
+    state.kpi.isTrainingMonth = false;
+
+    for (let i = 0; i < 8; i++) {
+      const action = i < 2 ? 'take_leave' : 'relax_idle';
+      performSlotAction(state, action, false);
+      if (i < 7) {
+        // Should never open an 'event' modal during relax_idle or take_leave
+        expect(state.activeModal).toBeNull();
+      } else {
+        // After 8th slot (end of month), monthly_report modal must appear with supervisor comment
+        expect(state.activeModal?.type).toBe('monthly_report');
+        expect(state.activeModal?.monthlyReport?.supervisorComment.length).toBeGreaterThan(10);
+      }
+    }
+  });
 });
