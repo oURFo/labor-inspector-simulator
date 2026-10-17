@@ -1,0 +1,74 @@
+[
+  {
+    "id": "contract",
+    "level": 0,
+    "title": "約聘檢查員",
+    "grade": "聘用人員",
+    "isManagement": false,
+    "kpiMultiplier": 1.0,
+    "nextRank": "specialist"
+  },
+  {
+    "id": "assistant",
+    "level": 1,
+    "title": "技佐",
+    "grade": "委任第四至第五職等",
+    "isManagement": false,
+    "kpiMultiplier": 1.0,
+    "nextRank": "specialist"
+  },
+  {
+    "id": "specialist",
+    "level": 2,
+    "title": "技士",
+    "grade": "委任第五職等或薦任第六至第七職等",
+    "isManagement": false,
+    "kpiMultiplier": 1.0,
+    "nextRank": "inspector"
+  },
+  {
+    "id": "inspector",
+    "level": 3,
+    "title": "檢查員",
+    "grade": "薦任第七職等",
+    "isManagement": false,
+    "kpiMultiplier": 1.2,
+    "nextRank": "senior_tech"
+  },
+  {
+    "id": "senior_tech",
+    "level": 4,
+    "title": "技正",
+    "grade": "薦任第七至第八職等",
+    "isManagement": false,
+    "kpiMultiplier": 1.2,
+    "nextRank": "chief"
+  },
+  {
+    "id": "chief",
+    "level": 5,
+    "title": "科長",
+    "grade": "薦任第八至第九職等",
+    "isManagement": true,
+    "kpiMultiplier": 1.5,
+    "nextRank": "deputy_director"
+  },
+  {
+    "id": "deputy_director",
+    "level": 6,
+    "title": "副處長",
+    "grade": "簡任第十職等",
+    "isManagement": true,
+    "kpiMultiplier": 1.5,
+    "nextRank": "director"
+  },
+  {
+    "id": "director",
+    "level": 7,
+    "title": "處長",
+    "grade": "簡任第十一職等",
+    "isManagement": true,
+    "kpiMultiplier": 1.5,
+    "nextRank": null
+  }
+]

@@ -1,0 +1,510 @@
+[
+  {
+    "id": "major_accident_fall",
+    "title": "【緊急通報】工地鷹架倒塌重大職災",
+    "divisions": ["civil_eng", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "上午剛進辦公室，值班台警鈴大作！轄區內一處大型建案發生外牆施工架倒塌，兩名移工從八樓墜落送醫不治。依《職業安全衛生法》第37條，處長下令立即派員封鎖現場、勒令停工並撰寫重大職災調查報告。",
+    "choices": [
+      {
+        "label": "立即趕赴現場勘災並撰寫停工處分書（耗費本格與下一格，情緒負壓 +12）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "blockNextSlots": 1,
+          "stress": 12,
+          "bossFavor": 4,
+          "reputation": 3,
+          "log": "處理重大營造職災並完成停工處分，耗費整週（2格）時間。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "major_accident_factory",
+    "title": "【緊急通報】沖床捲夾重大職災",
+    "divisions": ["general_industry", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "工業區傳來緊急通報！一家金屬加工廠為趕交貨私自拆除光電式安全裝置，導致勞工手臂遭大型沖床捲入重傷。你必須立刻放下手邊排程趕往現場保全證據。",
+    "choices": [
+      {
+        "label": "火速前往廠區採證、勒令局部停工（耗費本格與下一格，情緒負壓 +12）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "blockNextSlots": 1,
+          "stress": 12,
+          "bossFavor": 4,
+          "reputation": 3,
+          "log": "趕赴工廠調查沖床職災，耗費整週（2格）時間。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "major_accident_chemical",
+    "title": "【緊急通報】局限空間硫化氫中毒事故",
+    "divisions": ["occ_health", "civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "污水下水道清淤工程發生勞工未戴空氣呼吸器進入人孔，因硫化氫濃度過高接連昏迷！消防局與媒體已包圍現場，科長要你立刻帶氣體偵測器趕往現場。",
+    "choices": [
+      {
+        "label": "攜帶四用氣體偵測器趕往現場勘災（耗費本格與下一格，情緒負壓 +12）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "blockNextSlots": 1,
+          "stress": 12,
+          "bossFavor": 4,
+          "reputation": 3,
+          "log": "處理局限空間中毒職災，耗費整週（2格）時間。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "colleague_dump_cases",
+    "title": "資深前輩擺爛丟鍋",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 6,
+    "text": "隔壁座位的資深前輩老陳突然抱著一疊卷宗放到你桌上：「新人啊，我這禮拜痛風發作要去醫院，這幾場專案檢查跟催辦單科長說交給你代跑一下，年輕人多歷練啦！」",
+    "choices": [
+      {
+        "label": "咬牙吞下前輩丟來的案件（本月主要KPI目標增加 1 格工作量，負壓 +6，主管好感 +4）",
+        "effects": {
+          "extraPrimaryTargetActions": 1,
+          "stress": 6,
+          "bossFavor": 4,
+          "colleagueRelation": 3,
+          "log": "默默吞下資深前輩轉嫁的案件，本月檢查目標被迫增加！"
+        }
+      },
+      {
+        "label": "搬出分層負責明細表當場頂回去（負壓 -3，同事關係下降，主管好感 -2）",
+        "effects": {
+          "stress": -3,
+          "bossFavor": -2,
+          "colleagueRelation": -8,
+          "log": "拒絕前輩甩鍋，辦公室氣氛瞬間結冰，但保住了自己的排程。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "boss_urgent_report",
+    "title": "長官臨時交辦專案報表",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 6,
+    "text": "科長氣急敗壞地衝出辦公室：「明天早上局長要去市議會專案報告，點名要我們科近三年的違規態樣交叉分析表！你手邊事情先放著，今天下班前把簡報跟數據生出來！」",
+    "choices": [
+      {
+        "label": "取消原定行程，留在處裡趕製統計報表（本格作廢，負壓 +3，主管好感 +3）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 3,
+          "bossFavor": 3,
+          "log": "被臨時抓公差趕製議會專案報表，原定行程泡湯。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "councilor_lobbying",
+    "title": "市議員服務處主任關切電話",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 5,
+    "text": "你昨天開出裁處通知書的廠商，今天立刻找了市議員服務處主任打電話到處裡施壓：「年輕人不要這麼硬嘛！老闆也是第一次不懂《勞基法》，景氣這麼差，改開行政指導限期改善就好了吧？」",
+    "choices": [
+      {
+        "label": "堅持依法裁罰，向議員助理逐條說明法規（本格耗費於溝通作廢，負壓 +5，聲望 +4）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "頂住議員關說壓力堅持依法裁罰，但耗掉半天撰寫說明簽呈。"
+        }
+      },
+      {
+        "label": "【黑暗紓壓】順水推舟抽換紀錄改判限期改善（保住本格，負壓 -10，聲望 -10，累積貪瀆風險）",
+        "effects": {
+          "stress": -10,
+          "reputation": -10,
+          "corruption": 12,
+          "bossFavor": 1,
+          "log": "向政治壓力低頭放水，雖然瞬間輕鬆不少，但留下了抽換公文的把柄。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "bribe_envelope",
+    "title": "受檢廠商私下塞來的牛皮紙袋",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 5,
+    "text": "在廠區檢查發現多項足以停工與重罰三十萬的重大違規。離開時廠長追到停車場，把一個厚實的茶葉禮盒塞進你背包：「檢座，天氣熱買涼的喝，今天紀錄幫我們寫『尚符規定』，大家交個朋友……」",
+    "choices": [
+      {
+        "label": "嚴詞拒絕並當場通報政風室備查（負壓 +2，聲望 +5，主管好感 +3）",
+        "effects": {
+          "stress": 2,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "退回廠商賄賂並填具廉政倫理事件登錄表。"
+        }
+      },
+      {
+        "label": "【黑暗紓壓】不動聲色收下禮盒並放水過關（負壓 -20，大幅累積貪瀆風險）",
+        "effects": {
+          "stress": -20,
+          "corruption": 25,
+          "reputation": -5,
+          "log": "收下廠商的厚禮放水過關，心情久違地放鬆下來，但政風陰影悄然逼近……"
+        }
+      }
+    ]
+  },
+  {
+    "id": "employer_refusal",
+    "title": "雇主鎖門拒檢並放狗咆哮",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 6,
+    "text": "你出示勞動檢查證表明來意，鐵工廠老闆卻隔著鐵捲門破口大罵：「政府只會搶錢啦！沒有搜索票不准進來！」隨即放開兩隻大型狼犬對著你狂吠，現場僵持不下。",
+    "choices": [
+      {
+        "label": "會同轄區員警強制進場並依規避檢查開罰（本格檢查產出減半，負壓 +3，聲望 +2）",
+        "effects": {
+          "outputMultiplier": 0.5,
+          "stress": 3,
+          "reputation": 2,
+          "log": "遭遇雇主惡意拒檢，苦等警方支援耗費大量時間，本格檢查場次減半。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "media_breaking_sweatshop",
+    "title": "媒體踢爆知名大廠血汗過勞",
+    "divisions": ["labor_conditions", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "早報頭版刊出某知名上市企業員工連續加班16小時猝死的新聞，輿論沸騰！處長在晨會震怒，要求今日立即帶隊前往該企業總部進行深度專案勞檢。",
+    "choices": [
+      {
+        "label": "帶隊進駐企業總部逐筆勾稽打卡與門禁紀錄（本格僅能完成 1 場檢查，負壓 +5，聲望 +4）",
+        "effects": {
+          "overridePrimaryGain": 1,
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "執行媒體矚目之重大勞檢專案，因案情複雜僅完成 1 場深度檢查。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "court_testimony",
+    "title": "行政訴訟出庭應訊",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "半年前你開罰的一家大企業聘請王牌律師團提起行政訴訟，高等行政法院傳喚你以機關代表兼證人身分出庭說明稽查過程。",
+    "choices": [
+      {
+        "label": "整理卷宗出庭與企業律師激烈攻防（本格作廢，負壓 +4，主管好感 +3）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 4,
+          "bossFavor": 3,
+          "log": "前往高等行政法院出庭應訊，耗去半天行程。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "system_outage",
+    "title": "全國勞檢資訊系統大當機",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "公文系統與全國勞動檢查機構資訊系統同時憑證異常！所有檢查紀錄無法上傳、處分書也無法發文，資訊室廣播搶修中。",
+    "choices": [
+      {
+        "label": "只能坐在位置上乾等系統恢復（本格作廢，負壓 +2）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 2,
+          "log": "公務系統大當機，整整半天無法處理業務。"
+        }
+      },
+      {
+        "label": "趁機把法條講義攤在公文夾底下偷看（本格作廢，負壓 -2，稍微提升國考準備）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": -2,
+          "examBonus": 2,
+          "log": "趁系統當機光明正大看書複習法條！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "migrant_workers_protest",
+    "title": "外籍移工集體陳情欠薪案",
+    "divisions": ["labor_conditions", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "三十幾名外籍移工在勞工團體陪同下湧入勞檢處大廳拉白布條，控訴仲介與雇主非法扣留護照並苛扣膳宿費！",
+    "choices": [
+      {
+        "label": "會同通譯人員逐一製作筆錄（本月次要KPI目標 +1 件，負壓 +5，聲望 +4）",
+        "effects": {
+          "extraSecondaryTargetActions": 1,
+          "stress": 5,
+          "reputation": 4,
+          "log": "處理外籍移工集體陳情案，本月申訴專案目標增加 1 件。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "victim_family_petition",
+    "title": "職災家屬哭訴陳情",
+    "divisions": ["civil_eng", "building_eng", "general_industry", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 4,
+    "text": "上個月工安意外罹難勞工的家屬帶著遺照來到處裡陳情，哭訴包商至今不願賠償還企圖脫產，希望勞檢處主持公道。",
+    "choices": [
+      {
+        "label": "耐心安撫家屬並協助轉介職災個管員與法扶（本格作廢，負壓 +8，聲望 +5）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 8,
+          "reputation": 5,
+          "log": "接待職災罹難者家屬陳情，心理承受沉重壓力。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "employer_threat",
+    "title": "受檢工地主任言語恐嚇",
+    "divisions": ["civil_eng", "building_eng", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "你在工地抓到吊掛作業未設警戒區，刺青滿身的工地主任湊近你低聲威脅：「少年仔，我們老闆黑白兩道都很熟，你每天上下班騎哪條路我們都知道，開單前想清楚喔！」",
+    "choices": [
+      {
+        "label": "開啟密錄器存證並照開罰單（正常完成工作，負壓 +8，聲望 +4，主管好感 +3）",
+        "effects": {
+          "stress": 8,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "無懼工地黑道威脅依法開單，但下班路上難免膽戰心驚。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "typhoon_holiday",
+    "title": "強烈颱風過境停班停課",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 7,
+    "months": [7, 8, 9],
+    "weight": 5,
+    "text": "強烈颱風直撲北辰市，市政府宣布本週停班停課！處裡依規定按比例調降本月績效目標，你難得獲得喘息空間。",
+    "choices": [
+      {
+        "label": "在家聽風雨聲好好補眠放鬆（耗費 1 格公假並調降KPI，負壓 -6）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "officialLeaveSlots": 1,
+          "stress": -6,
+          "log": "颱風假停班，本月績效目標按比例調降，身心獲得休息。"
+        }
+      },
+      {
+        "label": "趁颱風假在家狂刷考古題（耗費 1 格公假並調降KPI，負壓 -2，提升國考準備）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "officialLeaveSlots": 1,
+          "stress": -2,
+          "examBonus": 3,
+          "log": "把握颱風假在家苦讀國考科目！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "summer_heat_project",
+    "title": "夏季戶外高溫熱危害專案啟動",
+    "divisions": ["civil_eng", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "months": [6, 7, 8],
+    "weight": 5,
+    "text": "進入盛夏極端高溫期，職安署下達全國營造業高溫熱危害預防專案檢查指令，各營造科室本月應增列檢查場次！",
+    "choices": [
+      {
+        "label": "頂著38度烈日加跑工地稽查遮陽與飲水設備（本月檢查目標 +3 處，負壓 +4）",
+        "effects": {
+          "extraPrimaryTargetRaw": 3,
+          "stress": 4,
+          "bossFavor": 2,
+          "log": "啟動夏季高溫專案，本月工地檢查目標增加 3 處。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "year_end_overtime_project",
+    "title": "歲末年終加班費與春安專案",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "months": [1, 12],
+    "weight": 5,
+    "text": "年關將近，零售服務業與客運業進入超時工作高峰期，處裡宣布啟動春安勞動條件專案勞檢！",
+    "choices": [
+      {
+        "label": "配合春安專案增加抽查場次（本月檢查目標 +4 場，負壓 +4）",
+        "effects": {
+          "extraPrimaryTargetRaw": 4,
+          "stress": 4,
+          "bossFavor": 2,
+          "log": "啟動春安專案，本月一般勞動檢查目標增加 4 場。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "colleague_support",
+    "title": "熱心同事順路支援聯合稽查",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "同科的學姊看你這禮拜案子排得滿滿當當，主動提議：「我今天下午也要去同一個工業區，順便載你一起去，我們分頭查更快！」",
+    "choices": [
+      {
+        "label": "感激地搭學姊便車聯合出勤（本格產出 ×1.5 倍，負壓 -3）",
+        "effects": {
+          "outputMultiplier": 1.5,
+          "stress": -3,
+          "colleagueRelation": 3,
+          "log": "獲得熱心學姊支援聯合稽查，本格檢查效率大幅提升！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "thank_you_letter",
+    "title": "勞工寄來親筆感謝信",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 7,
+    "weight": 4,
+    "text": "收發室轉來一封信，是你上個月協助追回二十萬資遣費與加班費的老勞工親筆寫的感謝卡，處長在處務會議上公開表揚了你。",
+    "choices": [
+      {
+        "label": "把感謝卡貼在辦公桌隔板上激勵自己（負壓 -6，主管好感 +4，聲望 +3）",
+        "effects": {
+          "stress": -6,
+          "bossFavor": 4,
+          "reputation": 3,
+          "log": "收到受助勞工的感謝信並獲處長表揚，深感這份工作的價值！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "joint_inspection_bonus",
+    "title": "跨局處聯合稽查表現優異",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "今日配合消防局、建管處執行大型百貨商場聯合公共安全稽查，路線規劃順暢，一次查獲多項缺失。",
+    "choices": [
+      {
+        "label": "順利完成聯合稽查（額外獲得 2 單位主要KPI進度，負壓 -3）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": -3,
+          "bossFavor": 2,
+          "log": "跨局處聯合稽查效率極佳，額外推進了本月績效進度！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mgmt_subordinate_blunder",
+    "title": "【主管危機】科內同仁弄丟處分書正本",
+    "divisions": ["all"],
+    "minRankLevel": 5,
+    "maxRankLevel": 7,
+    "weight": 6,
+    "text": "你升任主管後，科裡一名粗心的檢查員竟把已用印的重大裁處書正本遺留在超商影印機上，還被民眾拍照PO上網！",
+    "choices": [
+      {
+        "label": "親自出面道歉、召開檢討會並強化公文流程（本格作廢，負壓 +7，主管好感 +2）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 7,
+          "bossFavor": 2,
+          "log": "為下屬公文疏失親自善後檢討，耗去半天時間。"
+        }
+      },
+      {
+        "label": "【黑暗紓壓】把責任全推給約聘人員懲處結案（保住本格，負壓 -8，同事關係與聲望大跌）",
+        "effects": {
+          "stress": -8,
+          "reputation": -8,
+          "colleagueRelation": -12,
+          "log": "將疏失全推給基層背黑鍋，科內同仁對你心寒不已。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mgmt_council_interpellation",
+    "title": "【主管挑戰】市議會警政衛生委員會質詢",
+    "divisions": ["all"],
+    "minRankLevel": 5,
+    "maxRankLevel": 7,
+    "weight": 6,
+    "text": "市議會開議期間，議員輪番砲轟北辰市今年工安意外件數上升、外送員權益保障不足，點名勞檢處官員上備詢台罰站說明！",
+    "choices": [
+      {
+        "label": "熟背統計數據上台據理力爭（耗費本格，負壓 +10，主管好感 +5，聲望 +4）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 10,
+          "bossFavor": 5,
+          "reputation": 4,
+          "log": "赴市議會備詢唇槍舌戰，雖承受極大精神壓力但成功守住機關立場。"
+        }
+      }
+    ]
+  }
+]

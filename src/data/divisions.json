@@ -1,0 +1,146 @@
+[
+  {
+    "id": "labor_conditions",
+    "name": "勞動條件科",
+    "category": "一般勞動條件",
+    "description": "負責工時、工資、休假、加班費及出勤紀錄稽查，勞工申訴案件量龐大。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "一般勞動檢查",
+      "unit": "場",
+      "perAction": 4,
+      "monthlyTarget": 20,
+      "actionLabel": "實地勞動條件檢查",
+      "actionDesc": "前往事業單位抽查出勤紀錄、工資清冊與加班費給付情形（每格基礎 4 場，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "complaints",
+      "label": "勞工申訴結案",
+      "unit": "件",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "辦理1955勞工申訴案",
+      "actionDesc": "調查勞工檢舉超時工作、欠薪案件並製作談話紀錄結案（每格基礎 1 件，情緒負壓 +1）"
+    }
+  },
+  {
+    "id": "general_industry",
+    "name": "一般行業科",
+    "category": "製造業職安",
+    "description": "負責工廠、製造業、倉儲零售業之職業安全衛生檢查，常遇機械捲夾與感電災害。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "製造業職安檢查",
+      "unit": "場",
+      "perAction": 3,
+      "monthlyTarget": 15,
+      "actionLabel": "工廠職安衛實地檢查",
+      "actionDesc": "稽查製造業廠房機械護罩、危害標示與安全衛生管理（每格基礎 3 場，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "complaints",
+      "label": "專案申訴稽查",
+      "unit": "件",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "辦理職安申訴專案",
+      "actionDesc": "針對勞工通報廠區環境不安全或職災隱匿案件進行專責查處（每格基礎 1 件，情緒負壓 +1）"
+    }
+  },
+  {
+    "id": "civil_eng",
+    "name": "土木工程科",
+    "category": "營造類（土木）",
+    "description": "負責道路、橋梁、隧道、捷運及公共工程之營造工地安全檢查，高風險職災頻繁。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "土木工地檢查",
+      "unit": "處",
+      "perAction": 3,
+      "monthlyTarget": 15,
+      "actionLabel": "土木公共工程工地檢查",
+      "actionDesc": "巡檢橋梁隧道、管線開挖與擋土支撐等高風險工地（每格基礎 3 處，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "seminars",
+      "label": "自主管理宣導會",
+      "unit": "場",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "舉辦營造防災宣導會",
+      "actionDesc": "召集營造商與工地主任辦理職安防災宣導與教育講習（每格基礎 1 場，情緒負壓 +1）"
+    }
+  },
+  {
+    "id": "building_eng",
+    "name": "建築工程科",
+    "category": "營造類（建築）",
+    "description": "負責商辦大樓、集合住宅新建與拆除工程檢查，高處墜落與施工架倒塌風險最高。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "建築工地檢查",
+      "unit": "處",
+      "perAction": 3,
+      "monthlyTarget": 15,
+      "actionLabel": "建築工地高處作業檢查",
+      "actionDesc": "稽查大樓新建工程之施工架、開口護欄、安全網及防墜設施（每格基礎 3 處，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "seminars",
+      "label": "工地防災宣導會",
+      "unit": "場",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "辦理建築防墜宣導講習",
+      "actionDesc": "針對轄區建案承攬商舉辦墜落危害預防與熱危害講習（每格基礎 1 場，情緒負壓 +1）"
+    }
+  },
+  {
+    "id": "machinery",
+    "name": "危險機械設備科",
+    "category": "特殊機械設備",
+    "description": "負責固定式/移動式起重機、鍋爐、第一種壓力容器、升降機之檢查與發證管理。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "危機設備檢查",
+      "unit": "台",
+      "perAction": 4,
+      "monthlyTarget": 20,
+      "actionLabel": "危險性機械設備實地檢查",
+      "actionDesc": "執行塔吊、起重機、鍋爐及壓力容器定期檢查與現場測試（每格基礎 4 台，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "reviews",
+      "label": "竣工與合格證審查",
+      "unit": "件",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "辦理危機竣工簽證審查",
+      "actionDesc": "審核危險性機械設備安裝竣工報告與核發使用合格證（每格基礎 1 件，情緒負壓 +1）"
+    }
+  },
+  {
+    "id": "occ_health",
+    "name": "職業衛生科",
+    "category": "作業環境與化學品",
+    "description": "負責作業環境監測、特定化學物質、粉塵噪音、勞工健康檢查與母性保護稽查。",
+    "primaryKpi": {
+      "id": "inspections",
+      "label": "職業衛生專案檢查",
+      "unit": "場",
+      "perAction": 2,
+      "monthlyTarget": 10,
+      "actionLabel": "作業環境與化學品採樣檢查",
+      "actionDesc": "攜帶採樣儀器赴廠區執行有機溶劑、特定化學物質及通風設備檢查（每格基礎 2 場，情緒負壓 +1）"
+    },
+    "secondaryKpi": {
+      "id": "audits",
+      "label": "特種健檢與監測稽核",
+      "unit": "件",
+      "perAction": 1,
+      "monthlyTarget": 1,
+      "actionLabel": "稽核勞工特殊健康檢查",
+      "actionDesc": "查核事業單位特殊危害作業勞工健檢異常追蹤與過勞預防計畫（每格基礎 1 件，情緒負壓 +1）"
+    }
+  }
+]
