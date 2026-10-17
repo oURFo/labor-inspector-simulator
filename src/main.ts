@@ -21,7 +21,7 @@ import {
   resolveActiveModalChoice,
 } from './core/GameEngine';
 import { createRng } from './core/rng';
-import { loadAuto, loadFromSlot, saveAuto, saveToSlot } from './core/SaveSystem';
+import { clearAuto, loadAuto, loadFromSlot, saveAuto, saveToSlot } from './core/SaveSystem';
 
 const appEl = document.getElementById('app')!;
 
@@ -805,15 +805,22 @@ function renderActiveModalHtml(state: GameState): string {
 }
 
 function render() {
-  if (!currentState) {
+  try {
+    if (!currentState) {
+      renderTitleScreen();
+      return;
+    }
+    if (currentState.endingId) {
+      renderEndingScreen(currentState);
+      return;
+    }
+    renderMainGame(currentState);
+  } catch (err) {
+    console.error('Render error, resetting corrupted state to title screen:', err);
+    clearAuto();
+    currentState = null;
     renderTitleScreen();
-    return;
   }
-  if (currentState.endingId) {
-    renderEndingScreen(currentState);
-    return;
-  }
-  renderMainGame(currentState);
 }
 
 render();
