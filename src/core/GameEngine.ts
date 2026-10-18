@@ -171,8 +171,8 @@ export function isCurrentMonthKpiPassed(state: GameState): boolean {
 
 function rollRandomEvent(state: GameState, rng: Rng): GameEvent | null {
   if (state.kpi.isTrainingMonth) return null;
-  // Base 36% chance per slot (doubled from 18% per user request)
-  if (rng.next() >= 0.36) return null;
+  // Base 18% chance per slot (lowered to 18% per user request)
+  if (rng.next() >= 0.18) return null;
 
   const rankLevel = getRankDef(state.player.rankId).level;
   const eligible = EVENTS.filter((ev) => {
@@ -392,7 +392,7 @@ export function executeActionEffect(
       if (state.player.annualLeaveLeft > 0) {
         const stressBefore = state.player.stress;
         state.player.annualLeaveLeft -= 1;
-        addStress(state, -18);
+        addStress(state, -25);
         const stressAfter = state.player.stress;
         const dropped = stressBefore - stressAfter;
         state.lastFeedback = {

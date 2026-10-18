@@ -19,6 +19,13 @@ function migrateState(raw: unknown): GameState | null {
     s.rngState || Date.now()
   );
 
+  const divObj = DIVISIONS.find((d) => d.id === s.player?.divisionId);
+  const rankObj = RANKS.find((r) => r.id === s.player?.rankId);
+  const baseMaxPrimary =
+    divObj && rankObj
+      ? Math.round(divObj.primaryKpi.monthlyTarget * rankObj.kpiMultiplier)
+      : fallback.kpi.primaryTarget;
+
   return {
     ...fallback,
     ...s,
@@ -33,6 +40,10 @@ function migrateState(raw: unknown): GameState | null {
     kpi: {
       ...fallback.kpi,
       ...s.kpi,
+      primaryTarget:
+        typeof s.kpi.primaryTarget === 'number' && !s.kpi.isTrainingMonth
+          ? Math.min(s.kpi.primaryTarget, baseMaxPrimary)
+          : (s.kpi.primaryTarget ?? fallback.kpi.primaryTarget),
       highlightCases: Array.isArray(s.kpi.highlightCases) ? s.kpi.highlightCases : [],
     },
     halfYearFailedMonths:

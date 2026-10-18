@@ -32,7 +32,7 @@
     "title": "檢查員",
     "grade": "薦任第七職等",
     "isManagement": false,
-    "kpiMultiplier": 1.2,
+    "kpiMultiplier": 1.0,
     "nextRank": "senior_tech"
   },
   {
@@ -41,7 +41,7 @@
     "title": "技正",
     "grade": "薦任第七至第八職等",
     "isManagement": false,
-    "kpiMultiplier": 1.2,
+    "kpiMultiplier": 1.0,
     "nextRank": "chief"
   },
   {
@@ -50,7 +50,7 @@
     "title": "科長",
     "grade": "薦任第八至第九職等",
     "isManagement": true,
-    "kpiMultiplier": 1.5,
+    "kpiMultiplier": 1.25,
     "nextRank": "deputy_director"
   },
   {
@@ -59,7 +59,7 @@
     "title": "副處長",
     "grade": "簡任第十職等",
     "isManagement": true,
-    "kpiMultiplier": 1.5,
+    "kpiMultiplier": 1.25,
     "nextRank": "director"
   },
   {
@@ -68,7 +68,7 @@
     "title": "處長",
     "grade": "簡任第十一職等",
     "isManagement": true,
-    "kpiMultiplier": 1.5,
+    "kpiMultiplier": 1.25,
     "nextRank": null
   }
 ]
