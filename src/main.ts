@@ -6,7 +6,6 @@ import {
   GameState,
   getDivisionDef,
   getRankDef,
-  RANKS,
 } from './core/GameState';
 import {
   ENDINGS,
@@ -14,7 +13,6 @@ import {
   formatTimeLabel,
   getEffectiveActionOutput,
   getRemainingSlotsInMonth,
-  getStudyReadinessHint,
   isStressPenaltyActive,
   needsExamForSpecialist,
   performSlotAction,
@@ -327,9 +325,6 @@ function renderMainGame(state: GameState) {
   const anim = fb?.progressAnim;
   const doAnim = showStepResultPopup && shouldAnimateProgress && !!anim;
 
-  const animFromPct = anim
-    ? Math.min(100, Math.max(0, Math.round((anim.fromValue / Math.max(1, anim.maxValue)) * 100)))
-    : 0;
   const animToPct = anim
     ? Math.min(100, Math.max(0, Math.round((anim.toValue / Math.max(1, anim.maxValue)) * 100)))
     : 0;
