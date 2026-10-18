@@ -48,6 +48,7 @@ export interface MonthlyKpiState {
 
 export interface PendingExamResult {
   kind: ExamKind;
+  examName?: string;
   passed: boolean;
   announceYear: number;
   announceMonth: number;
@@ -110,6 +111,11 @@ export interface MonthlyReportData {
   supervisorComment: string;
   halfYearFailedMonths: number;
   halfYearSummary?: string;
+  examResult?: {
+    examName: string;
+    passed: boolean;
+    summary: string;
+  };
 }
 
 export interface ActiveModal {

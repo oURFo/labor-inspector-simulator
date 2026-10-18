@@ -9,7 +9,6 @@ import {
 } from './core/GameState';
 import {
   ENDINGS,
-  estimateSlotsNeededForMonth,
   formatTimeLabel,
   getEffectiveActionOutput,
   getRemainingSlotsInMonth,
@@ -30,92 +29,6 @@ let darkMode = false;
 function setTheme(dark: boolean) {
   darkMode = dark;
   document.documentElement.setAttribute('data-theme', dark ? 'dark' : 'light');
-}
-
-function getRecommendedAction(state: GameState): {
-  actionId: ActionId;
-  reason: string;
-  urgency: 'normal' | 'warn' | 'danger';
-} {
-  const rankDef = getRankDef(state.player.rankId);
-  const divDef = getDivisionDef(state.player.divisionId);
-  const slotsLeft = getRemainingSlotsInMonth(state);
-  const slotsNeeded = estimateSlotsNeededForMonth(state);
-  const canStudy = needsExamForSpecialist(state);
-
-  if (state.player.blockedSlots > 0) {
-    return {
-      actionId: 'primary_work',
-      reason: `本時段因「${state.player.blockedReason}」鎖定，請點擊下方按鈕推進時段。`,
-      urgency: 'warn',
-    };
-  }
-
-  // 1. Critical stress warning (>= 65)
-  if (state.player.stress >= 68) {
-    if (state.player.annualLeaveLeft > 0 && slotsLeft > slotsNeeded) {
-      return {
-        actionId: 'take_leave',
-        reason: `⚠️ 情緒負壓已高達 ${state.player.stress}/100（滿 70 產出減半、滿 100 過勞结局）！建議立即【請休特休假】降壓！`,
-        urgency: 'danger',
-      };
-    }
-    return {
-      actionId: 'relax_idle',
-      reason: `⚠️ 情緒負壓已高達 ${state.player.stress}/100（滿 70 產出減半）！建議先點選【茶水間摸魚喘息】降壓！`,
-      urgency: 'danger',
-    };
-  }
-
-  // 2. Training month (Year 1 Month 1)
-  if (state.kpi.isTrainingMonth) {
-    return {
-      actionId: 'slack_study',
-      reason: '💡 1月份為職前訓練月（免算 KPI），強烈建議連續點選【偷懶看書】衝高 7 月高考上榜率！',
-      urgency: 'normal',
-    };
-  }
-
-  // 3. Monthly KPI not yet met
-  if (state.kpi.secondaryProgress < state.kpi.secondaryTarget) {
-    return {
-      actionId: rankDef.isManagement ? 'mgmt_coord' : 'secondary_work',
-      reason: `📌 本月「${divDef.secondaryKpi.label}」尚未完成（${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}），建議優先點選完成！`,
-      urgency: slotsNeeded >= slotsLeft ? 'danger' : 'normal',
-    };
-  }
-
-  if (state.kpi.primaryProgress < state.kpi.primaryTarget) {
-    const rem = state.kpi.primaryTarget - state.kpi.primaryProgress;
-    return {
-      actionId: rankDef.isManagement ? 'mgmt_supervise' : 'primary_work',
-      reason: `📌 本月「${divDef.primaryKpi.label}」還差 ${rem} ${divDef.primaryKpi.unit}（剩餘 ${slotsLeft} 格時段，需工作 ${slotsNeeded} 格），建議先跑完檢查確保達標！`,
-      urgency: slotsNeeded >= slotsLeft ? 'warn' : 'normal',
-    };
-  }
-
-  // 4. Monthly KPI already 100% completed!
-  if (canStudy) {
-    return {
-      actionId: 'slack_study',
-      reason: `✅ 本月兩項 KPI 已 100% 達標！剩餘 ${slotsLeft} 個時段可安心點選【偷懶看書】衝刺國考！`,
-      urgency: 'normal',
-    };
-  }
-
-  if (state.player.stress >= 40) {
-    return {
-      actionId: 'relax_idle',
-      reason: `✅ 本月 KPI 已全數達標！建議點選【摸魚喘息】調降情緒負壓（目前 ${state.player.stress}/100）。`,
-      urgency: 'normal',
-    };
-  }
-
-  return {
-    actionId: rankDef.isManagement ? 'mgmt_supervise' : 'primary_work',
-    reason: '✅ 本月 KPI 已達標且身心狀況良好，可繼續執行業務累積長官好感與聲望。',
-    urgency: 'normal',
-  };
 }
 
 function startNewGame(playerName: string) {
@@ -157,7 +70,7 @@ function renderTitleScreen() {
             <li><strong>先看每月進度條</strong>：每個月有 8 個時段（4 週 × 上下午），通常做 <strong>5 次工作</strong>（4 主 + 1 次）就能把本月兩項 KPI 填滿達標。</li>
             <li><strong>有多餘時段再偷看書</strong>：偷看書不會被抓，但會少做工作；<strong>半年內只要有 3 個月沒達標就會被開除！</strong></li>
             <li><strong>注意情緒負壓</strong>：每次外出稽查與辦案都會累積負壓（+5～+6），<strong>偷看書不會降壓</strong>，負壓快到 70 時記得按「摸魚」或「休假（-25）」喘口氣。</li>
-            <li><strong>小心突發事件</strong>：目前每格工作或看書有 <strong>18% 機率</strong>遇到工安意外、前輩甩鍋、議員關說或塞紅包（摸魚與休假不會觸發突發事件）！</li>
+            <li><strong>小心突發事件</strong>：目前每格工作或看書有 <strong>26% 機率</strong>遇到工安意外、前輩甩鍋、議員關說或塞紅包（摸魚與休假不會觸發突發事件）！</li>
           </ol>
         </div>
 
@@ -293,7 +206,6 @@ function renderMainGame(state: GameState) {
   const slotsLeft = getRemainingSlotsInMonth(state);
   const penaltyActive = isStressPenaltyActive(state);
   const canStudy = needsExamForSpecialist(state);
-  const rec = getRecommendedAction(state);
 
   const pDone = state.kpi.primaryProgress >= state.kpi.primaryTarget;
   const sDone = state.kpi.secondaryProgress >= state.kpi.secondaryTarget;
@@ -357,10 +269,6 @@ function renderMainGame(state: GameState) {
 
         <!-- 2. Simplified Status & Progress Card -->
         <div class="panel-box" style="margin-bottom: 12px;">
-          <div class="guidance-banner ${rec.urgency}" style="margin-bottom: 10px; padding: 8px 10px;">
-            <div class="guidance-reason" style="font-size: 0.88rem;">${rec.reason}</div>
-          </div>
-
           <div class="meter-group" style="margin-bottom: 10px;">
             <div class="meter-top">
               <span>👷 主KPI：${divDef.primaryKpi.label} ${pDone ? '✅' : ''}</span>
@@ -408,21 +316,19 @@ function renderMainGame(state: GameState) {
           <div class="actions-grid">
             ${
               state.player.blockedSlots > 0
-                ? `<button class="action-card recommended" data-action="primary_work">
+                ? `<button class="action-card" data-action="primary_work">
                     <div class="action-title">
                       <span>⏳ 執行鎖定行程：${state.player.blockedReason}</span>
-                      <span class="action-tag rec-badge">★ 必點推進</span>
+                      <span class="action-tag">點擊推進</span>
                     </div>
                   </button>`
                 : rankDef.isManagement
                 ? `
-                  <button class="action-card ${
-                    rec.actionId === 'mgmt_supervise' ? 'recommended' : ''
-                  }" data-action="mgmt_supervise">
+                  <button class="action-card" data-action="mgmt_supervise">
                     <div class="action-title">
                       <span>📋 督導科室專案稽查</span>
                       <span class="action-tag ${pDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'mgmt_supervise' ? '★ 推薦｜' : ''}+${getEffectiveActionOutput(
+                        +${getEffectiveActionOutput(
                     state,
                     divDef.primaryKpi.perAction,
                     1.25
@@ -430,35 +336,29 @@ function renderMainGame(state: GameState) {
                       </span>
                     </div>
                   </button>
-                  <button class="action-card ${
-                    rec.actionId === 'mgmt_coord' ? 'recommended' : ''
-                  }" data-action="mgmt_coord">
+                  <button class="action-card" data-action="mgmt_coord">
                     <div class="action-title">
                       <span>🏛️ 主持跨局處協調會</span>
                       <span class="action-tag ${sDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'mgmt_coord' ? '★ 推薦｜' : ''}+${perSecondaryGain}${divDef.secondaryKpi.unit}
+                        +${perSecondaryGain}${divDef.secondaryKpi.unit}
                       </span>
                     </div>
                   </button>
                 `
                 : `
-                  <button class="action-card ${
-                    rec.actionId === 'primary_work' ? 'recommended' : ''
-                  }" data-action="primary_work">
+                  <button class="action-card" data-action="primary_work">
                     <div class="action-title">
                       <span>👷 ${divDef.primaryKpi.actionLabel}</span>
                       <span class="action-tag ${pDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'primary_work' ? '★ 推薦｜' : ''}主KPI +${perPrimaryGain}${divDef.primaryKpi.unit}
+                        主KPI +${perPrimaryGain}${divDef.primaryKpi.unit}
                       </span>
                     </div>
                   </button>
-                  <button class="action-card ${
-                    rec.actionId === 'secondary_work' ? 'recommended' : ''
-                  }" data-action="secondary_work">
+                  <button class="action-card" data-action="secondary_work">
                     <div class="action-title">
                       <span>📁 ${divDef.secondaryKpi.actionLabel}</span>
                       <span class="action-tag ${sDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'secondary_work' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain}${divDef.secondaryKpi.unit}
+                        次KPI +${perSecondaryGain}${divDef.secondaryKpi.unit}
                       </span>
                     </div>
                   </button>
@@ -468,14 +368,10 @@ function renderMainGame(state: GameState) {
             ${
               state.player.blockedSlots === 0 && canStudy
                 ? `
-                <button class="action-card study ${
-                  rec.actionId === 'slack_study' ? 'recommended' : ''
-                }" data-action="slack_study">
+                <button class="action-card study" data-action="slack_study">
                   <div class="action-title">
                     <span>📖 偷懶看書（準備國考）</span>
-                    <span class="action-tag">
-                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}精進法學實力 📚
-                    </span>
+                    <span class="action-tag">精進法學實力 📚</span>
                   </div>
                 </button>`
                 : ''
@@ -484,26 +380,18 @@ function renderMainGame(state: GameState) {
             ${
               state.player.blockedSlots === 0
                 ? `
-                <button class="action-card ${
-                  rec.actionId === 'relax_idle' ? 'recommended' : ''
-                }" data-action="relax_idle">
+                <button class="action-card" data-action="relax_idle">
                   <div class="action-title">
                     <span>☕ 茶水間摸魚喘息</span>
-                    <span class="action-tag">
-                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10 ✨
-                    </span>
+                    <span class="action-tag">負壓 -10 ✨</span>
                   </div>
                 </button>
-                <button class="action-card ${
-                  rec.actionId === 'take_leave' ? 'recommended' : ''
-                }" data-action="take_leave" ${
+                <button class="action-card" data-action="take_leave" ${
                     state.player.annualLeaveLeft <= 0 ? 'disabled' : ''
                   }>
                   <div class="action-title">
                     <span>🌴 請休特休假（剩 ${state.player.annualLeaveLeft} 格）</span>
-                    <span class="action-tag">
-                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -25 ☀️
-                    </span>
+                    <span class="action-tag">負壓 -25 ☀️</span>
                   </div>
                 </button>`
                 : ''
@@ -652,11 +540,21 @@ function renderActiveModalHtml(state: GameState): string {
           </div>
           <h3 class="modal-title" style="font-size:1.18rem; margin-bottom:10px;">${fb.actionTitle}</h3>
 
+          <div class="modal-body" style="margin-bottom:12px;">
+            ${fb.site ? `<div style="font-weight:700; margin-bottom:4px;">📍 ${fb.site}</div>` : ''}
+            <div style="line-height:1.6;">${fb.detail}</div>
+            ${
+              fb.finding
+                ? `<div style="margin-top:6px; font-weight:700; color:var(--seal-red);">${fb.finding}</div>`
+                : ''
+            }
+          </div>
+
           ${
             anim
               ? anim.kind === 'study'
                 ? `
-            <div class="anim-progress-card">
+            <div class="anim-progress-card" style="margin-bottom:14px;">
               <div class="anim-positive-banner ${anim.barTheme}">
                 <span>${anim.positiveBanner}</span>
               </div>
@@ -666,7 +564,7 @@ function renderActiveModalHtml(state: GameState): string {
               </div>
             </div>`
                 : `
-            <div class="anim-progress-card">
+            <div class="anim-progress-card" style="margin-bottom:14px;">
               <div class="anim-positive-banner ${anim.barTheme}">
                 <span>${anim.positiveBanner}</span>
               </div>
@@ -688,16 +586,6 @@ function renderActiveModalHtml(state: GameState): string {
             </div>`
               : ''
           }
-
-          <div class="modal-body" style="margin-bottom:14px;">
-            ${fb.site ? `<div style="font-weight:700; margin-bottom:4px;">📍 ${fb.site}</div>` : ''}
-            <div style="line-height:1.6;">${fb.detail}</div>
-            ${
-              fb.finding
-                ? `<div style="margin-top:6px; font-weight:700; color:var(--seal-red);">${fb.finding}</div>`
-                : ''
-            }
-          </div>
 
           <div class="choice-stack">
             <button class="choice-btn" id="btn-step-confirm" style="text-align:center; background:var(--gov-navy); color:#fff; font-weight:700;">
@@ -777,6 +665,22 @@ function renderActiveModalHtml(state: GameState): string {
           };">
             ${statusText}
           </div>
+
+          ${
+            r.examResult
+              ? `
+          <div style="padding: 10px 14px; border-radius: 5px; margin-bottom: 12px; font-weight: 700; background: ${
+            r.examResult.passed ? 'var(--jade-light)' : 'var(--amber-light)'
+          }; color: ${
+                  r.examResult.passed ? 'var(--jade-good)' : 'var(--amber-warn)'
+                }; border: 1.5px solid ${
+                  r.examResult.passed ? 'var(--jade-good)' : 'var(--amber-warn)'
+                };">
+            <div style="font-size: 0.85rem; margin-bottom: 2px;">🎓 考選部本月國家考試放榜結果（應試當下已決定）：</div>
+            <div>${r.examResult.summary}</div>
+          </div>`
+              : ''
+          }
 
           <div class="officer-strip" style="margin-bottom: 12px; padding: 10px 12px;">
             <div class="officer-cell">

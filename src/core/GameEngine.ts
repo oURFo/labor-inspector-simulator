@@ -178,8 +178,8 @@ export function isCurrentMonthKpiPassed(state: GameState): boolean {
 
 function rollRandomEvent(state: GameState, rng: Rng): GameEvent | null {
   if (state.kpi.isTrainingMonth) return null;
-  // Base 18% chance per slot (lowered to 18% per user request)
-  if (rng.next() >= 0.18) return null;
+  // Base 26% chance per slot (adjusted to 26% per user request)
+  if (rng.next() >= 0.26) return null;
 
   const rankLevel = getRankDef(state.player.rankId).level;
   const eligible = EVENTS.filter((ev) => {
@@ -336,10 +336,14 @@ export function executeActionEffect(
           ? '✨ 頗有斬獲！把容易混淆的勞檢法規與行政救濟流程重新梳理了一遍，記憶更加深刻！'
           : '📖 穩步累積！趁空檔多背了幾條常考法條與判例見解，腦中印象又紮實了一些。';
 
+      const postExamNote = state.pendingExam
+        ? '（註：本月國考結果已於應試當下決定，考後讀書不會增加本次成功率）'
+        : '';
+
       const stageChangeText =
         beforeStage !== afterStage
-          ? `準備狀態晉升：「${beforeStage}」 ➔ 「${afterStage}」`
-          : `目前準備狀態：「${afterStage}」（持續深化記憶中）`;
+          ? `準備狀態晉升：「${beforeStage}」 ➔ 「${afterStage}」${postExamNote}`
+          : `目前準備狀態：「${afterStage}」（持續深化記憶中）${postExamNote}`;
 
       const story = rng.pick(vignettesData.slackStudy);
       state.lastFeedback = {
@@ -621,6 +625,8 @@ function checkMandatoryExamWeek(state: GameState, rng: Rng): boolean {
 }
 
 export function conductExam(state: GameState, kind: ExamKind, rng: Rng): void {
+  // Pass/fail is strictly determined at the exact moment of taking the exam!
+  // Any studying after the exam will NOT change this locked-in result.
   const passRate = getExamPassRatePercent(state, kind);
   const roll = rng.next() * 100;
   const passed = roll < passRate;
@@ -630,39 +636,29 @@ export function conductExam(state: GameState, kind: ExamKind, rng: Rng): void {
   state.player.blockedSlots += 1;
   state.player.blockedReason = '參加國家考試（下午場次）';
 
-  let announceYear = state.time.year;
-  let announceMonth = 9;
-  let announceWeek = 4;
+  const announceYear = state.time.year;
+  const announceMonth = state.time.month;
+  const announceWeek = 4;
   let targetRank: RankId = 'specialist';
   let examName = '公務人員高等考試三級考試';
 
   if (kind === 'high_3') {
-    announceMonth = 9;
-    announceWeek = 4;
     targetRank = 'specialist';
     examName = '公務人員高考三級（勞工行政／工業安全）';
   } else if (kind === 'local_3') {
-    announceYear = state.time.year + 1;
-    announceMonth = 2;
-    announceWeek = 1;
     targetRank = 'specialist';
     examName = '地方政府特考三等考試';
   } else if (kind === 'local_4') {
-    announceYear = state.time.year + 1;
-    announceMonth = 2;
-    announceWeek = 1;
     targetRank = 'assistant';
     examName = '地方政府特考四等考試';
   } else if (kind === 'promo_jianren') {
-    announceYear = state.time.year + 1;
-    announceMonth = 1;
-    announceWeek = 2;
     targetRank = 'specialist';
     examName = '公務人員薦任升官等考試';
   }
 
   state.pendingExam = {
     kind,
+    examName,
     passed,
     announceYear,
     announceMonth,
@@ -673,62 +669,61 @@ export function conductExam(state: GameState, kind: ExamKind, rng: Rng): void {
   state.lastFeedback = {
     timeLabel: formatTimeLabel(state),
     actionTitle: `✍️ 應試：${examName}`,
-    detail: `你帶著准考證與文具進入國家考場振筆疾書（本週核給公假 2 格，本月 KPI 已按比例調降為 ${state.kpi.primaryTarget} / ${state.kpi.secondaryTarget}）。`,
-    finding: `📅 預計放榜時間：${announceMonth}月第${announceWeek}週`,
-    impactSummary: `考前準備狀態：${getStudyReadinessHint(state)}｜下午場次將繼續應試`,
+    detail: `你帶著准考證與文具進入國家考場振筆疾書（本週核給公假 2 格，本月 KPI 已按比例調降為 ${state.kpi.primaryTarget} / ${state.kpi.secondaryTarget}）。是否上榜已於交卷當下定讞，考後繼續讀書不會改變本次考試結果。`,
+    finding: `📅 放榜時間：本（${announceMonth}）月底績效結算時直接公布結果`,
+    impactSummary: `應試當下準備狀態：${getStudyStageText(state.player.examBonus)}｜下午場次將繼續應試`,
     tone: 'info',
   };
 
   addLog(
     state,
-    `【國家考試】參加「${examName}」（公假 2 格，${announceMonth}月第${announceWeek}週放榜）`,
+    `【國家考試】參加「${examName}」（已交卷定讞，將於本月底結算時直接放榜）`,
     'info'
   );
 }
 
-function checkExamAnnouncement(state: GameState): void {
+function resolveMonthEndExamAnnouncement(
+  state: GameState
+): { examName: string; passed: boolean; summary: string } | undefined {
   const pending = state.pendingExam;
-  if (!pending) return;
-  if (
-    state.time.year === pending.announceYear &&
-    state.time.month === pending.announceMonth &&
-    state.time.week === pending.announceWeek &&
-    state.time.slot === 'AM'
-  ) {
-    state.pendingExam = null;
-    if (pending.passed) {
-      // Reset examBonus ONLY when passing!
-      state.player.examBonus = 0;
-      addStress(state, -30);
+  if (!pending) return undefined;
 
-      if (pending.kind === 'promo_jianren') {
-        // Immediate promotion from 技佐 to 技士
-        state.player.rankId = 'specialist';
-        state.player.monthsInRank = 0;
-        addLog(
-          state,
-          `🎉【金榜題名】薦任升官等考試放榜錄取！你正式晉升為「薦任技士」，情緒負壓大幅降低 30 點！`,
-          'good'
-        );
-      } else {
-        state.player.practicalTrainingMonths = 4;
-        state.player.targetRankAfterTraining = pending.targetRank;
-        const targetTitle = getRankDef(pending.targetRank).title;
-        addLog(
-          state,
-          `🎉【金榜題名】國家考試放榜錄取！情緒負壓 -30！即日起展開為期 4 個月的實務訓練，期滿將正式派代「${targetTitle}」（累積讀書加成已重置）。`,
-          'good'
-        );
-      }
+  state.pendingExam = null;
+  const examName =
+    pending.examName ??
+    (pending.kind === 'high_3'
+      ? '公務人員高考三級（勞工行政／工業安全）'
+      : pending.kind === 'local_3'
+      ? '地方政府特考三等考試'
+      : pending.kind === 'local_4'
+      ? '地方政府特考四等考試'
+      : '公務人員薦任升官等考試');
+
+  if (pending.passed) {
+    // Reset examBonus ONLY when passing!
+    state.player.examBonus = 0;
+    addStress(state, -30);
+
+    if (pending.kind === 'promo_jianren') {
+      state.player.rankId = 'specialist';
+      state.player.monthsInRank = 0;
+      const summary = `🎉【金榜題名】「${examName}」放榜錄取！正式晉升為「薦任技士」，情緒負壓大幅降低 30 點！`;
+      addLog(state, summary, 'good');
+      return { examName, passed: true, summary };
     } else {
-      // Failed: keep examBonus!
-      addStress(state, 10);
-      addLog(
-        state,
-        `【國考落榜】考選部放榜結果未錄取，情緒負壓 +10。但先前的讀書記憶仍在，繼續努力下次更有把握！`,
-        'warn'
-      );
+      state.player.practicalTrainingMonths = 4;
+      state.player.targetRankAfterTraining = pending.targetRank;
+      const targetTitle = getRankDef(pending.targetRank).title;
+      const summary = `🎉【金榜題名】「${examName}」放榜錄取！情緒負壓 -30！下個月起展開為期 4 個月的實務訓練，期滿將正式派代「${targetTitle}」（讀書準備狀態已重置）。`;
+      addLog(state, summary, 'good');
+      return { examName, passed: true, summary };
     }
+  } else {
+    // Failed: keep examBonus!
+    addStress(state, 10);
+    const summary = `📄【國考放榜：未錄取】「${examName}」本次未上榜（情緒負壓 +10）。但先前的苦讀記憶仍保留，繼續累積實力下次再戰！`;
+    addLog(state, summary, 'warn');
+    return { examName, passed: false, summary };
   }
 }
 
@@ -874,13 +869,16 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
     }
   }
 
-  // 4. Half-year review at end of June (month 6) and December (month 12)
+  // 4. Resolve National Exam announcement directly at the end of the exam month!
+  const examResult = resolveMonthEndExamAnnouncement(state);
+
+  // 5. Half-year review at end of June (month 6) and December (month 12)
   let halfYearSummary: string | undefined;
   if (!state.endingId && (monthEnded === 6 || monthEnded === 12)) {
     halfYearSummary = processHalfYearReview(state, rng);
   }
 
-  // 5. Create monthly settlement report modal (if game hasn't ended)
+  // 6. Create monthly settlement report modal (if game hasn't ended)
   if (!state.endingId) {
     state.activeModal = {
       type: 'monthly_report',
@@ -905,6 +903,7 @@ function processEndOfMonth(state: GameState, rng: Rng): void {
         supervisorComment,
         halfYearFailedMonths: halfYearFailedSnapshot,
         halfYearSummary,
+        examResult,
       },
     };
   }
@@ -1081,7 +1080,6 @@ export function advanceClockOneSlot(state: GameState, rng: Rng): void {
 
   if (state.time.week < 4) {
     state.time.week += 1;
-    checkExamAnnouncement(state);
     return;
   }
 
@@ -1117,7 +1115,6 @@ export function advanceClockOneSlot(state: GameState, rng: Rng): void {
     state.player.rankId,
     false
   );
-  checkExamAnnouncement(state);
 }
 
 export function resolveFiveYearEnding(state: GameState): void {

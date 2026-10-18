@@ -101,6 +101,22 @@ describe('Labor Inspector Simulator Core Engine', () => {
     state.player.rankId = 'assistant';
     state.player.examBonus = 0;
     expect(getExamPassRatePercent(state, 'high_3')).toBe(10);
+
+    // Exam result is locked at conductExam time and announced at the end of the SAME month
+    state.time.month = 7;
+    state.time.week = 1;
+    state.time.slot = 'AM';
+    conductExam(state, 'high_3', rng);
+    const lockedPassed = state.pendingExam!.passed;
+    // Studying after the exam in the same month must NOT alter pendingExam.passed
+    executeActionEffect(state, 'slack_study', rng);
+    expect(state.pendingExam!.passed).toBe(lockedPassed);
+    // Advance to the end of July (8 slots total in the month) -> announced in monthlyReport.examResult
+    for (let i = 0; i < 8; i++) {
+      advanceClockOneSlot(state, rng);
+    }
+    expect(state.pendingExam).toBeNull();
+    expect(state.activeModal?.monthlyReport?.examResult?.passed).toBe(lockedPassed);
   });
 
   it('triggers KPI dismissal ending when failing 3 months in a half-year', () => {
