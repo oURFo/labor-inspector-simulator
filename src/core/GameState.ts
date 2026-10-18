@@ -144,6 +144,20 @@ export interface HalfYearRecord {
   rankAtReview: RankId;
 }
 
+export interface AnimatedProgressFeedback {
+  kind: 'work_primary' | 'work_secondary' | 'rest' | 'study';
+  label: string;
+  positiveBanner: string;
+  fromValue: number;
+  toValue: number;
+  maxValue: number;
+  unit: string;
+  deltaText: string;
+  barTheme: 'kpi' | 'relief' | 'study';
+  secondaryStressFrom?: number;
+  secondaryStressTo?: number;
+}
+
 export interface LatestFeedback {
   timeLabel: string;
   actionTitle: string;
@@ -152,6 +166,7 @@ export interface LatestFeedback {
   finding?: string;
   impactSummary: string;
   tone: 'info' | 'good' | 'warn' | 'bad';
+  progressAnim?: AnimatedProgressFeedback;
 }
 
 export interface GameState {

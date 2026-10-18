@@ -227,11 +227,15 @@ export function executeActionEffect(
 
   switch (actionId) {
     case 'primary_work': {
+      const beforeVal = state.kpi.primaryProgress;
+      const stressBefore = state.player.stress;
       const gain =
         effectOverride?.overridePrimaryGain !== undefined
           ? effectOverride.overridePrimaryGain
           : getEffectiveActionOutput(state, div.primaryKpi.perAction, mult);
       state.kpi.primaryProgress += gain;
+      const afterVal = state.kpi.primaryProgress;
+      const targetVal = Math.max(1, state.kpi.primaryTarget || div.primaryKpi.monthlyTarget);
       addStress(state, 5);
 
       const pool = vignettesData.primaryWork[state.player.divisionId];
@@ -243,19 +247,36 @@ export function executeActionEffect(
         site: `受檢單位：${v.site}`,
         detail: v.detail,
         finding: `📋 稽查處置：${v.finding}`,
-        impactSummary: `${div.primaryKpi.label} +${gain} ${div.primaryKpi.unit}（本月累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}）｜情緒負壓 +5`,
+        impactSummary: `${div.primaryKpi.label} +${gain} ${div.primaryKpi.unit}（本月累計 ${afterVal}/${state.kpi.primaryTarget}）｜情緒負壓 +5`,
         tone: 'info',
+        progressAnim: {
+          kind: 'work_primary',
+          label: `📊 本月「${div.primaryKpi.label}」完成進度`,
+          positiveBanner: `🎯 本次完成 +${gain} ${div.primaryKpi.unit}！進度由 ${beforeVal} 推進至 ${afterVal} / ${state.kpi.primaryTarget} ${div.primaryKpi.unit}`,
+          fromValue: beforeVal,
+          toValue: afterVal,
+          maxValue: targetVal,
+          unit: div.primaryKpi.unit,
+          deltaText: `+${gain} ${div.primaryKpi.unit}（${beforeVal} ➔ ${afterVal}）`,
+          barTheme: 'kpi',
+          secondaryStressFrom: stressBefore,
+          secondaryStressTo: state.player.stress,
+        },
       };
       addLog(
         state,
-        `【${v.site}】${v.detail} ${v.finding}（+${gain}${div.primaryKpi.unit}，累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}，負壓 +5）`,
+        `【${v.site}】${v.detail} ${v.finding}（+${gain}${div.primaryKpi.unit}，累計 ${afterVal}/${state.kpi.primaryTarget}，負壓 +5）`,
         'info'
       );
       break;
     }
     case 'secondary_work': {
+      const beforeVal = state.kpi.secondaryProgress;
+      const stressBefore = state.player.stress;
       const gain = getEffectiveActionOutput(state, div.secondaryKpi.perAction, mult);
       state.kpi.secondaryProgress += gain;
+      const afterVal = state.kpi.secondaryProgress;
+      const targetVal = Math.max(1, state.kpi.secondaryTarget || div.secondaryKpi.monthlyTarget);
       addStress(state, 6);
 
       const pool = vignettesData.secondaryWork[state.player.divisionId];
@@ -266,70 +287,148 @@ export function executeActionEffect(
         actionTitle: `📁 ${div.secondaryKpi.actionLabel}`,
         site: `承辦業務：${div.secondaryKpi.label}`,
         detail: story,
-        impactSummary: `${div.secondaryKpi.label} +${gain} ${div.secondaryKpi.unit}（本月累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}）｜情緒負壓 +6`,
+        impactSummary: `${div.secondaryKpi.label} +${gain} ${div.secondaryKpi.unit}（本月累計 ${afterVal}/${state.kpi.secondaryTarget}）｜情緒負壓 +6`,
         tone: 'info',
+        progressAnim: {
+          kind: 'work_secondary',
+          label: `📊 本月「${div.secondaryKpi.label}」完成進度`,
+          positiveBanner: `🎯 本次完成 +${gain} ${div.secondaryKpi.unit}！進度由 ${beforeVal} 推進至 ${afterVal} / ${state.kpi.secondaryTarget} ${div.secondaryKpi.unit}`,
+          fromValue: beforeVal,
+          toValue: afterVal,
+          maxValue: targetVal,
+          unit: div.secondaryKpi.unit,
+          deltaText: `+${gain} ${div.secondaryKpi.unit}（${beforeVal} ➔ ${afterVal}）`,
+          barTheme: 'kpi',
+          secondaryStressFrom: stressBefore,
+          secondaryStressTo: state.player.stress,
+        },
       };
       addLog(
         state,
-        `【${div.secondaryKpi.actionLabel}】${story}（+${gain}${div.secondaryKpi.unit}，累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}，負壓 +6）`,
+        `【${div.secondaryKpi.actionLabel}】${story}（+${gain}${div.secondaryKpi.unit}，累計 ${afterVal}/${state.kpi.secondaryTarget}，負壓 +6）`,
         'info'
       );
       break;
     }
     case 'slack_study': {
+      const beforeBonus = state.player.examBonus;
       const bonus = rng.nextInt(1, 3);
       state.player.examBonus = clamp(state.player.examBonus + bonus, 0, 55);
-      // Removed stress relief per user request! Studying does NOT reduce stress.
+      const afterBonus = state.player.examBonus;
+      const fromRate = Math.min(60, 10 + beforeBonus);
+      const toRate = Math.min(60, 10 + afterBonus);
+
+      const studyEncouragePool = [
+        `✨ 知識吸收大有斬獲！艱澀的法條爭點瞬間融會貫通，國考實力 +${bonus}%！`,
+        `📚 苦讀沒有白費！考古題解題速度明顯提升，累計知識加成達 +${afterBonus}%！`,
+        `💡 腦中法學架構越來越清晰！離金榜題名轉任正式公務員又近了一大步（+${bonus}%）！`,
+      ];
+      const posBanner =
+        afterBonus >= 50
+          ? `🏆 知識儲備已達巔峰！國考上榜把握度已達最高上限 60%（累計加成 +${afterBonus}%）！`
+          : rng.pick(studyEncouragePool);
+
       const story = rng.pick(vignettesData.slackStudy);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: '📖 偷閒苦讀國考科目',
         detail: story,
-        impactSummary: `國考上榜把握度提升（${getStudyReadinessHint(state)}）｜本時段無業務產出｜情緒負壓不變`,
+        finding: `📈 知識累積報告：本次實力 +${bonus}%｜累計讀書加成 +${beforeBonus}% ➔ +${afterBonus}%（逐階上榜把握度 ${fromRate}% ➔ ${toRate}% / 最高60%）`,
+        impactSummary: `國考知識累積 +${bonus}%（${getStudyReadinessHint(state)}）｜本時段無業務產出｜情緒負壓不變`,
         tone: 'good',
+        progressAnim: {
+          kind: 'study',
+          label: '📚 國考知識累積與上榜把握度（上限 60%）',
+          positiveBanner: posBanner,
+          fromValue: fromRate,
+          toValue: toRate,
+          maxValue: 60,
+          unit: '%',
+          deltaText: `知識 +${bonus}%（${fromRate}% ➔ ${toRate}%）`,
+          barTheme: 'study',
+        },
       };
       addLog(
         state,
-        `【偷閒看書】${story}（國考準備度提升，本時段無KPI產出）`,
+        `【偷閒看書】${story}（知識累積 +${bonus}%，累計讀書加成 +${afterBonus}%，上榜把握度 ${toRate}%）`,
         'good'
       );
       break;
     }
     case 'relax_idle': {
+      const stressBefore = state.player.stress;
       addStress(state, -10);
+      const stressAfter = state.player.stress;
+      const dropped = stressBefore - stressAfter;
       const story = rng.pick(vignettesData.relaxIdle);
+      const restEncouragePool = [
+        `✨ 身心獲得充分喘息！緊繃的神經終於鬆開，情緒負壓成功減少 ${dropped} 點！`,
+        `🌿 休息是為了走更長遠的路！肩膀不再僵硬，心情明顯開朗許多（負壓 -${dropped}）！`,
+        `☕ 片刻寧靜洗去一身疲憊，工地與公文的鳥氣瞬間煙消雲散（負壓 ${stressBefore} ➔ ${stressAfter}）！`,
+      ];
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: '☕ 茶水間摸魚放空',
         detail: story,
-        impactSummary: `情緒負壓 -10（目前 ${state.player.stress}/100）｜本時段無業務產出`,
+        finding: `💚 正向舒壓回饋：情緒負壓由 ${stressBefore} 降至 ${stressAfter}（釋放 -${dropped} 點壓力，精神恢復飽滿！）`,
+        impactSummary: `情緒負壓 -${dropped}（${stressBefore} ➔ ${stressAfter}/100）｜本時段無業務產出`,
         tone: 'good',
+        progressAnim: {
+          kind: 'rest',
+          label: '🌿 情緒負壓釋放動態（數值越低越輕鬆）',
+          positiveBanner: rng.pick(restEncouragePool),
+          fromValue: stressBefore,
+          toValue: stressAfter,
+          maxValue: 100,
+          unit: '點',
+          deltaText: `負壓 -${dropped} 點（${stressBefore} ➔ ${stressAfter}）`,
+          barTheme: 'relief',
+        },
       };
-      addLog(state, `【摸魚喘息】${story}（情緒負壓 -10）`, 'good');
+      addLog(state, `【摸魚喘息】${story}（情緒負壓 ${stressBefore} ➔ ${stressAfter}）`, 'good');
       break;
     }
     case 'take_leave': {
       if (state.player.annualLeaveLeft > 0) {
+        const stressBefore = state.player.stress;
         state.player.annualLeaveLeft -= 1;
         addStress(state, -18);
+        const stressAfter = state.player.stress;
+        const dropped = stressBefore - stressAfter;
         state.lastFeedback = {
           timeLabel: tLabel,
           actionTitle: '🌴 請休半天特休假',
           detail: '你關掉公務機群組通知，徹底遠離工地噪音與刁民申訴電話，睡到自然醒後去吃了頓大餐。',
-          impactSummary: `情緒負壓 -18（剩餘特休 ${state.player.annualLeaveLeft} 格，注意：本月 KPI 目標不變）`,
+          finding: `💚 深度休假充電完成：情緒負壓由 ${stressBefore} 大幅降至 ${stressAfter}（釋放 -${dropped} 點壓力，身心煥然一新！）`,
+          impactSummary: `情緒負壓 -${dropped}（剩餘特休 ${state.player.annualLeaveLeft} 格，注意：本月 KPI 目標不變）`,
           tone: 'good',
+          progressAnim: {
+            kind: 'rest',
+            label: '🌴 特休深度減壓動態（數值越低越輕鬆）',
+            positiveBanner: `☀️ 休假充電大成功！負壓由 ${stressBefore} 大幅退散至 ${stressAfter}（釋放 ${dropped} 點壓力）！`,
+            fromValue: stressBefore,
+            toValue: stressAfter,
+            maxValue: 100,
+            unit: '點',
+            deltaText: `負壓 -${dropped} 點（${stressBefore} ➔ ${stressAfter}）`,
+            barTheme: 'relief',
+          },
         };
         addLog(
           state,
-          `【請休特休假】關掉公務機徹底休息半天（剩餘 ${state.player.annualLeaveLeft} 格），情緒負壓 -18（本月績效目標不變）。`,
+          `【請休特休假】關掉公務機徹底休息半天（剩餘 ${state.player.annualLeaveLeft} 格），情緒負壓 ${stressBefore} ➔ ${stressAfter}（本月績效目標不變）。`,
           'good'
         );
       }
       break;
     }
     case 'mgmt_supervise': {
+      const beforeVal = state.kpi.primaryProgress;
+      const stressBefore = state.player.stress;
       const gain = getEffectiveActionOutput(state, div.primaryKpi.perAction, mult * 1.25);
       state.kpi.primaryProgress += gain;
+      const afterVal = state.kpi.primaryProgress;
+      const targetVal = Math.max(1, state.kpi.primaryTarget || div.primaryKpi.monthlyTarget);
       state.player.bossFavor = clamp(state.player.bossFavor + 2, 0, 100);
       addStress(state, 5);
       const story = rng.pick(vignettesData.mgmtSupervise);
@@ -338,8 +437,21 @@ export function executeActionEffect(
         timeLabel: tLabel,
         actionTitle: '📋 督導科室專案稽查',
         detail: story,
-        impactSummary: `科室主KPI +${gain} ${div.primaryKpi.unit}（累計 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}）｜長官好感 +2｜情緒負壓 +5`,
+        impactSummary: `科室主KPI +${gain} ${div.primaryKpi.unit}（累計 ${afterVal}/${state.kpi.primaryTarget}）｜長官好感 +2｜情緒負壓 +5`,
         tone: 'info',
+        progressAnim: {
+          kind: 'work_primary',
+          label: `📊 科室「${div.primaryKpi.label}」完成進度`,
+          positiveBanner: `🎯 督導專案完成 +${gain} ${div.primaryKpi.unit}！進度由 ${beforeVal} 推進至 ${afterVal} / ${state.kpi.primaryTarget} ${div.primaryKpi.unit}`,
+          fromValue: beforeVal,
+          toValue: afterVal,
+          maxValue: targetVal,
+          unit: div.primaryKpi.unit,
+          deltaText: `+${gain} ${div.primaryKpi.unit}（${beforeVal} ➔ ${afterVal}）`,
+          barTheme: 'kpi',
+          secondaryStressFrom: stressBefore,
+          secondaryStressTo: state.player.stress,
+        },
       };
       addLog(
         state,
@@ -349,8 +461,12 @@ export function executeActionEffect(
       break;
     }
     case 'mgmt_coord': {
+      const beforeVal = state.kpi.secondaryProgress;
+      const stressBefore = state.player.stress;
       const gain = getEffectiveActionOutput(state, div.secondaryKpi.perAction, mult);
       state.kpi.secondaryProgress += gain;
+      const afterVal = state.kpi.secondaryProgress;
+      const targetVal = Math.max(1, state.kpi.secondaryTarget || div.secondaryKpi.monthlyTarget);
       state.player.reputation = clamp(state.player.reputation + 2, 0, 100);
       addStress(state, 5);
       const story = rng.pick(vignettesData.mgmtCoord);
@@ -359,8 +475,21 @@ export function executeActionEffect(
         timeLabel: tLabel,
         actionTitle: '🏛️ 主持跨局處與專案協調會',
         detail: story,
-        impactSummary: `次要KPI +${gain} ${div.secondaryKpi.unit}（累計 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}）｜社會聲望 +2｜情緒負壓 +5`,
+        impactSummary: `次要KPI +${gain} ${div.secondaryKpi.unit}（累計 ${afterVal}/${state.kpi.secondaryTarget}）｜社會聲望 +2｜情緒負壓 +5`,
         tone: 'info',
+        progressAnim: {
+          kind: 'work_secondary',
+          label: `📊 科室「${div.secondaryKpi.label}」完成進度`,
+          positiveBanner: `🎯 跨局處協調完成 +${gain} ${div.secondaryKpi.unit}！進度由 ${beforeVal} 推進至 ${afterVal} / ${state.kpi.secondaryTarget} ${div.secondaryKpi.unit}`,
+          fromValue: beforeVal,
+          toValue: afterVal,
+          maxValue: targetVal,
+          unit: div.secondaryKpi.unit,
+          deltaText: `+${gain} ${div.secondaryKpi.unit}（${beforeVal} ➔ ${afterVal}）`,
+          barTheme: 'kpi',
+          secondaryStressFrom: stressBefore,
+          secondaryStressTo: state.player.stress,
+        },
       };
       addLog(
         state,

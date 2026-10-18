@@ -151,4 +151,34 @@ describe('Labor Inspector Simulator Core Engine', () => {
       }
     }
   });
+
+  it('populates dynamic progressAnim data for work (10->14), rest (stress reduction), and study (knowledge gain)', () => {
+    const state = createInitialGameState('測試員', 'labor_conditions', 2026);
+    const rng = createRng(2026);
+    state.kpi.isTrainingMonth = false;
+    state.kpi.primaryTarget = 20;
+    state.kpi.primaryProgress = 10;
+
+    // 1. Primary work: 10 -> 14
+    executeActionEffect(state, 'primary_work', rng);
+    expect(state.lastFeedback?.progressAnim?.kind).toBe('work_primary');
+    expect(state.lastFeedback?.progressAnim?.fromValue).toBe(10);
+    expect(state.lastFeedback?.progressAnim?.toValue).toBe(14);
+
+    // 2. Rest: stress decreases with positive banner
+    state.player.stress = 50;
+    executeActionEffect(state, 'relax_idle', rng);
+    expect(state.lastFeedback?.progressAnim?.kind).toBe('rest');
+    expect(state.lastFeedback?.progressAnim?.fromValue).toBe(50);
+    expect(state.lastFeedback?.progressAnim?.toValue).toBe(40);
+    expect(state.lastFeedback?.progressAnim?.positiveBanner.length).toBeGreaterThan(5);
+
+    // 3. Study: knowledge increases with positive banner
+    state.player.examBonus = 10;
+    executeActionEffect(state, 'slack_study', rng);
+    expect(state.lastFeedback?.progressAnim?.kind).toBe('study');
+    expect(state.lastFeedback?.progressAnim?.fromValue).toBe(20);
+    expect(state.lastFeedback?.progressAnim?.toValue).toBeGreaterThan(20);
+    expect(state.lastFeedback?.progressAnim?.positiveBanner.length).toBeGreaterThan(5);
+  });
 });
