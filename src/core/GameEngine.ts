@@ -243,7 +243,7 @@ export function executeActionEffect(
       state.kpi.highlightCases.push(`【${v.site}】${v.finding}（+${gain}${div.primaryKpi.unit}）`);
       state.lastFeedback = {
         timeLabel: tLabel,
-        actionTitle: `ヘルメット ${div.primaryKpi.actionLabel}`,
+        actionTitle: `👷 ${div.primaryKpi.actionLabel}`,
         site: `受檢單位：${v.site}`,
         detail: v.detail,
         finding: `📋 稽查處置：${v.finding}`,
@@ -265,7 +265,7 @@ export function executeActionEffect(
       };
       addLog(
         state,
-        `【${v.site}】${v.detail} ${v.finding}（+${gain}${div.primaryKpi.unit}，累計 ${afterVal}/${state.kpi.primaryTarget}，負壓 +5）`,
+        `【${v.site}】${div.primaryKpi.label} +${gain}${div.primaryKpi.unit}（${beforeVal}➔${afterVal}/${state.kpi.primaryTarget}），負壓 +5`,
         'info'
       );
       break;
@@ -305,7 +305,7 @@ export function executeActionEffect(
       };
       addLog(
         state,
-        `【${div.secondaryKpi.actionLabel}】${story}（+${gain}${div.secondaryKpi.unit}，累計 ${afterVal}/${state.kpi.secondaryTarget}，負壓 +6）`,
+        `【${div.secondaryKpi.actionLabel}】+${gain}${div.secondaryKpi.unit}（${beforeVal}➔${afterVal}/${state.kpi.secondaryTarget}），負壓 +6`,
         'info'
       );
       break;
@@ -350,7 +350,7 @@ export function executeActionEffect(
       };
       addLog(
         state,
-        `【偷閒看書】${story}（知識累積 +${bonus}%，累計讀書加成 +${afterBonus}%，上榜把握度 ${toRate}%）`,
+        `【偷閒看書】知識累積 +${bonus}%（上榜把握度 ${fromRate}%➔${toRate}%）`,
         'good'
       );
       break;
@@ -385,7 +385,7 @@ export function executeActionEffect(
           barTheme: 'relief',
         },
       };
-      addLog(state, `【摸魚喘息】${story}（情緒負壓 ${stressBefore} ➔ ${stressAfter}）`, 'good');
+      addLog(state, `【摸魚喘息】情緒負壓 -${dropped}（${stressBefore}➔${stressAfter}）`, 'good');
       break;
     }
     case 'take_leave': {
@@ -416,7 +416,7 @@ export function executeActionEffect(
         };
         addLog(
           state,
-          `【請休特休假】關掉公務機徹底休息半天（剩餘 ${state.player.annualLeaveLeft} 格），情緒負壓 ${stressBefore} ➔ ${stressAfter}（本月績效目標不變）。`,
+          `【請休特休假】情緒負壓 -${dropped}（${stressBefore}➔${stressAfter}，剩餘特休 ${state.player.annualLeaveLeft} 格）`,
           'good'
         );
       }
@@ -455,7 +455,7 @@ export function executeActionEffect(
       };
       addLog(
         state,
-        `【督導專案稽查】${story}（+${gain}${div.primaryKpi.unit}，長官好感 +2，負壓 +5）`,
+        `【督導稽查】+${gain}${div.primaryKpi.unit}（${beforeVal}➔${afterVal}/${state.kpi.primaryTarget}），好感 +2，負壓 +5`,
         'info'
       );
       break;
@@ -493,7 +493,7 @@ export function executeActionEffect(
       };
       addLog(
         state,
-        `【主持專案協調】${story}（+${gain}${div.secondaryKpi.unit}，社會聲望 +2，負壓 +5）`,
+        `【主持專案協調】+${gain}${div.secondaryKpi.unit}（${beforeVal}➔${afterVal}/${state.kpi.secondaryTarget}），聲望 +2，負壓 +5`,
         'info'
       );
       break;
@@ -655,9 +655,18 @@ export function conductExam(state: GameState, kind: ExamKind, rng: Rng): void {
     targetRank,
   };
 
+  state.lastFeedback = {
+    timeLabel: formatTimeLabel(state),
+    actionTitle: `✍️ 應試：${examName}`,
+    detail: `你帶著准考證與文具進入國家考場振筆疾書（本週核給公假 2 格，本月 KPI 已按比例調降為 ${state.kpi.primaryTarget} / ${state.kpi.secondaryTarget}）。`,
+    finding: `📅 預計放榜時間：${announceMonth}月第${announceWeek}週`,
+    impactSummary: `上榜把握度：${passRate}%｜下午場次將繼續應試`,
+    tone: 'info',
+  };
+
   addLog(
     state,
-    `【國家考試】請公假參加「${examName}」（本週 2 格公假，本月 KPI 已按比例調降）。將於放榜日揭曉結果！`,
+    `【國家考試】參加「${examName}」（公假 2 格，${announceMonth}月第${announceWeek}週放榜）`,
     'info'
   );
 }
@@ -1138,9 +1147,16 @@ export function performSlotAction(
   // 1. Check if current slot is blocked (e.g., exam PM or disaster investigation day 2)
   if (state.player.blockedSlots > 0) {
     state.player.blockedSlots -= 1;
+    state.lastFeedback = {
+      timeLabel: formatTimeLabel(state),
+      actionTitle: `⏳ 執行鎖定行程：${state.player.blockedReason}`,
+      detail: `本時段持續辦理「${state.player.blockedReason}」，無法排定其他常規業務。`,
+      impactSummary: `剩餘鎖定時段：${state.player.blockedSlots} 格｜目前負壓 ${state.player.stress}/100`,
+      tone: 'info',
+    };
     addLog(
       state,
-      `【行程鎖定】本時段因「${state.player.blockedReason}」無法排定其他工作。`,
+      `【行程鎖定】辦理「${state.player.blockedReason}」`,
       'info'
     );
     advanceClockOneSlot(state, rng);

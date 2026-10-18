@@ -565,21 +565,23 @@ body {
 .modal-backdrop {
   position: fixed;
   inset: 0;
-  background: rgba(15, 18, 20, 0.68);
+  background: rgba(15, 18, 20, 0.72);
   display: flex;
   align-items: center;
   justify-content: center;
-  padding: 16px;
+  padding: 12px;
   z-index: 100;
 }
 
 .modal-doc {
   background: var(--bg-paper);
-  border: 3px solid var(--border-dark);
+  border: 2.5px solid var(--border-dark);
   border-radius: 6px;
-  max-width: 620px;
+  max-width: 560px;
   width: 100%;
-  padding: 24px;
+  max-height: 90dvh;
+  overflow-y: auto;
+  padding: 18px;
   box-shadow: 0 16px 48px rgba(0, 0, 0, 0.45);
 }
 
@@ -589,34 +591,34 @@ body {
   border: 2px solid var(--seal-red);
   padding: 2px 8px;
   font-weight: 900;
-  font-size: 0.78rem;
-  margin-bottom: 8px;
+  font-size: 0.76rem;
   border-radius: 3px;
 }
 
 .modal-title {
   font-family: 'Noto Serif TC', serif;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 900;
-  margin-bottom: 12px;
+  margin-bottom: 10px;
 }
 
 .modal-body {
-  font-size: 0.95rem;
+  font-size: 0.92rem;
   white-space: pre-line;
-  margin-bottom: 18px;
+  margin-bottom: 14px;
   color: var(--ink-primary);
+  overflow-wrap: break-word;
 }
 
 .choice-stack {
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 8px;
 }
 
 .choice-btn {
   text-align: left;
-  padding: 12px 14px;
+  padding: 11px 14px;
   border-radius: 5px;
   border: 1.5px solid var(--border-dark);
   background: var(--bg-paper-alt);
@@ -636,7 +638,7 @@ body {
 /* Title & Ending Screen */
 .hero-card {
   max-width: 680px;
-  margin: 28px auto;
+  margin: 16px auto;
 }
 
 .ending-badge {
@@ -669,6 +671,7 @@ body {
   background: var(--bg-paper);
   color: var(--ink-primary);
   font-family: inherit;
+  width: 100%;
 }
 
 .primary-cta {
@@ -687,162 +690,35 @@ body {
   opacity: 0.92;
 }
 
-/* =========================================================
-   Mobile-First Live Synchronized HUD & Dynamic Progress Bar
-   ========================================================= */
-.live-hud-strip {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 8px;
-  background: var(--bg-paper);
-  border: 2px solid var(--gov-navy);
-  border-radius: 6px;
-  padding: 10px 12px;
-  margin-bottom: 12px;
-  position: sticky;
-  top: 6px;
-  z-index: 30;
-  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
-}
-
-.hud-mini-card {
-  background: var(--bg-paper-alt);
-  border: 1px solid var(--border-doc);
-  border-radius: 5px;
-  padding: 6px 8px;
-  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
-}
-
-.hud-mini-card.just-updated {
-  border-color: var(--seal-red);
-  box-shadow: 0 0 0 2px rgba(181, 43, 36, 0.22);
-  animation: pulseHudCard 0.65s ease-out;
-}
-
-.hud-mini-card.just-updated.good-update {
-  border-color: var(--jade-good);
-  box-shadow: 0 0 0 2px rgba(42, 111, 78, 0.25);
-}
-
-@keyframes pulseHudCard {
-  0% {
-    transform: scale(0.98);
-  }
-  45% {
-    transform: scale(1.03);
-  }
-  100% {
-    transform: scale(1);
-  }
-}
-
-.hud-mini-top {
+/* Compact Meta Strip on Simplified Main Screen */
+.compact-meta-row {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  font-size: 0.76rem;
-  font-weight: 700;
-  margin-bottom: 4px;
-  gap: 4px;
-}
-
-.hud-mini-label {
+  flex-wrap: wrap;
+  gap: 6px;
+  padding-top: 8px;
+  border-top: 1px dashed var(--border-doc);
+  font-size: 0.82rem;
   color: var(--ink-secondary);
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
-.hud-mini-val {
-  color: var(--ink-primary);
-  white-space: nowrap;
-}
-
-.hud-delta-tag {
-  display: inline-block;
-  font-size: 0.7rem;
-  font-weight: 800;
-  padding: 0 5px;
-  border-radius: 99px;
-  margin-left: 3px;
-}
-
-.hud-delta-tag.up {
-  background: var(--gov-navy);
-  color: #fff;
-}
-
-.hud-delta-tag.relief {
-  background: var(--jade-good);
-  color: #fff;
-}
-
-.hud-delta-tag.study {
-  background: var(--amber-warn);
-  color: #fff;
-}
-
-.hud-mini-track {
-  width: 100%;
-  height: 8px;
-  background: var(--bg-paper);
-  border: 1px solid var(--border-doc);
-  border-radius: 99px;
-  overflow: hidden;
-  position: relative;
-}
-
-.hud-mini-fill {
-  height: 100%;
-  border-radius: 99px;
-  transition: width 0.68s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.hud-mini-fill.kpi {
-  background: linear-gradient(90deg, var(--gov-navy), #2b5c8f);
-}
-
-.hud-mini-fill.kpi-done {
-  background: linear-gradient(90deg, var(--jade-good), #40916c);
-}
-
-.hud-mini-fill.stress-ok {
-  background: var(--jade-good);
-}
-
-.hud-mini-fill.stress-warn {
-  background: var(--amber-warn);
-}
-
-.hud-mini-fill.stress-danger {
-  background: var(--seal-red);
-}
-
-.hud-mini-fill.study {
-  background: linear-gradient(90deg, #6b4c9a, #9d4edd);
-}
-
-/* Dynamic Action Progress Card inside Feedback Showcase */
+/* Dynamic Action Progress Card inside Step Result Modal */
 .anim-progress-card {
-  background: var(--bg-paper);
+  background: var(--bg-paper-alt);
   border: 1.5px solid var(--border-dark);
   border-radius: 6px;
   padding: 10px 12px;
-  margin-bottom: 10px;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.06);
+  margin-bottom: 12px;
 }
 
 .anim-positive-banner {
-  font-size: 0.92rem;
+  font-size: 0.9rem;
   font-weight: 800;
   padding: 6px 10px;
   border-radius: 4px;
   margin-bottom: 8px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  gap: 6px;
+  line-height: 1.45;
 }
 
 .anim-positive-banner.kpi {
@@ -878,7 +754,7 @@ body {
   display: inline-block;
   padding: 2px 8px;
   border-radius: 99px;
-  font-size: 0.78rem;
+  font-size: 0.76rem;
   font-weight: 800;
   color: #fff;
   background: var(--gov-navy);
@@ -895,7 +771,7 @@ body {
 .anim-bar-track {
   width: 100%;
   height: 16px;
-  background: var(--bg-paper-alt);
+  background: var(--bg-paper);
   border: 1.5px solid var(--border-dark);
   border-radius: 99px;
   overflow: hidden;
@@ -932,12 +808,28 @@ body {
   background: linear-gradient(90deg, #5a189a, #9d4edd);
 }
 
+/* Global Mobile Width Containment — Never Overflow Screen */
+html,
+body {
+  max-width: 100%;
+  overflow-x: hidden;
+}
+
+.app-shell,
+.doc-sheet,
+.panel-box,
+.action-card,
+.modal-doc {
+  max-width: 100%;
+  min-width: 0;
+}
+
 @media (max-width: 760px) {
-  .live-hud-strip {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 6px;
-    padding: 8px;
-    top: 4px;
+  body {
+    padding: 6px;
+  }
+  .doc-sheet {
+    padding: 12px;
   }
   .gov-header {
     padding-bottom: 8px;
@@ -945,30 +837,45 @@ body {
     gap: 8px;
   }
   .gov-title h1 {
-    font-size: 1.12rem;
+    font-size: 1.08rem;
   }
   .official-seal {
-    width: 38px;
-    height: 38px;
+    width: 36px;
+    height: 36px;
     font-size: 11px;
   }
-  .guidance-banner {
-    padding: 8px 12px;
-    margin-bottom: 10px;
+  .badge-time {
+    font-size: 0.82rem;
+    padding: 4px 8px;
   }
-  .guidance-reason {
-    font-size: 0.9rem;
+  .btn-small {
+    padding: 4px 8px;
+    font-size: 0.78rem;
   }
-  .feedback-showcase {
+  .panel-box {
     padding: 10px 12px;
-    margin-bottom: 12px;
+  }
+  .meter-top {
+    font-size: 0.82rem;
+    flex-wrap: wrap;
+    gap: 4px;
   }
   .actions-grid {
     grid-template-columns: 1fr;
     gap: 8px;
+    margin-top: 6px;
   }
   .action-card {
-    padding: 9px 12px;
+    padding: 10px 12px;
+  }
+  .action-title {
+    font-size: 0.9rem;
+    margin-bottom: 0;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .modal-doc {
+    padding: 14px;
   }
 }
 

@@ -260,6 +260,7 @@ function renderEndingScreen(state: GameState) {
 }
 
 let shouldAnimateProgress = false;
+let showStepResultPopup = false;
 
 function animateNumber(
   el: HTMLElement | null,
@@ -275,7 +276,6 @@ function animateNumber(
   const start = performance.now();
   function step(now: number) {
     const t = Math.min(1, (now - start) / durationMs);
-    // easeOutCubic
     const eased = 1 - Math.pow(1 - t, 3);
     const current = Math.round(from + (to - from) * eased);
     if (el) el.textContent = String(current);
@@ -292,7 +292,6 @@ function renderMainGame(state: GameState) {
   const rankDef = getRankDef(state.player.rankId);
   const divDef = getDivisionDef(state.player.divisionId);
   const slotsLeft = getRemainingSlotsInMonth(state);
-  const slotsNeeded = estimateSlotsNeededForMonth(state);
   const penaltyActive = isStressPenaltyActive(state);
   const canStudy = needsExamForSpecialist(state);
   const rec = getRecommendedAction(state);
@@ -313,7 +312,6 @@ function renderMainGame(state: GameState) {
       : 100;
 
   const studyReadinessPct = Math.min(60, 10 + state.player.examBonus);
-  const studyBarPct = Math.min(100, Math.round((studyReadinessPct / 60) * 100));
 
   const stressClass =
     state.player.stress >= 70
@@ -325,76 +323,31 @@ function renderMainGame(state: GameState) {
   const perPrimaryGain = getEffectiveActionOutput(state, divDef.primaryKpi.perAction);
   const perSecondaryGain = getEffectiveActionOutput(state, divDef.secondaryKpi.perAction);
 
-  const nextExamText = !canStudy
-    ? '已具薦任資格（免考）'
-    : state.pendingExam
-    ? `等待放榜（${state.pendingExam.announceMonth}月第${state.pendingExam.announceWeek}週）`
-    : state.time.month < 7
-    ? '7月第1週 高考三級'
-    : state.time.month === 11 &&
-      (115 + state.time.year) % 2 === 1 &&
-      state.player.rankId === 'assistant'
-    ? '本月第1週 薦任升官等'
-    : '12月第1週 地方特考';
-
   const fb = state.lastFeedback;
   const anim = fb?.progressAnim;
-  const doAnim = shouldAnimateProgress && !!anim;
+  const doAnim = showStepResultPopup && shouldAnimateProgress && !!anim;
 
-  // Compute initial vs target percentages for the animated showcase bar
   const animFromPct = anim
     ? Math.min(100, Math.max(0, Math.round((anim.fromValue / Math.max(1, anim.maxValue)) * 100)))
     : 0;
   const animToPct = anim
     ? Math.min(100, Math.max(0, Math.round((anim.toValue / Math.max(1, anim.maxValue)) * 100)))
     : 0;
-  const animInitialPct = doAnim ? animFromPct : animToPct;
-  const animInitialVal = doAnim && anim ? anim.fromValue : anim?.toValue ?? 0;
-
-  // Compute HUD initial widths so the top HUD bar also animates in sync if we are in the same month
-  const sameMonthForKpi = state.kpi.primaryProgress > 0 || state.kpi.secondaryProgress > 0;
-  const hudPrimaryInitPct =
-    doAnim && anim?.kind === 'work_primary' && sameMonthForKpi ? animFromPct : pPct;
-  const hudPrimaryInitVal =
-    doAnim && anim?.kind === 'work_primary' && sameMonthForKpi
-      ? anim.fromValue
-      : state.kpi.primaryProgress;
-
-  const hudSecondaryInitPct =
-    doAnim && anim?.kind === 'work_secondary' && sameMonthForKpi ? animFromPct : sPct;
-  const hudSecondaryInitVal =
-    doAnim && anim?.kind === 'work_secondary' && sameMonthForKpi
-      ? anim.fromValue
-      : state.kpi.secondaryProgress;
-
-  const hudStressInitPct =
-    doAnim && anim?.kind === 'rest'
-      ? animFromPct
-      : doAnim && anim?.secondaryStressFrom !== undefined
-      ? anim.secondaryStressFrom
-      : state.player.stress;
-
-  const hudStudyInitPct =
-    doAnim && anim?.kind === 'study'
-      ? Math.min(100, Math.round((anim.fromValue / 60) * 100))
-      : studyBarPct;
-  const hudStudyInitVal =
-    doAnim && anim?.kind === 'study' ? anim.fromValue : studyReadinessPct;
 
   appEl.innerHTML = `
     <div class="app-shell">
       <div class="doc-sheet">
-        <!-- 1. Simplified Top Bar -->
+        <!-- 1. Compact Header -->
         <div class="gov-header">
           <div class="gov-title-group">
             <div class="official-seal">北辰<br/>勞檢</div>
             <div class="gov-title">
-              <h1>${state.player.name}｜${rankDef.title}（${divDef.name}）</h1>
+              <h1>${state.player.name}｜${rankDef.title}</h1>
               <div class="gov-subtitle">
-                第 ${state.time.year}/5 年・${
+                ${divDef.name}・第 ${state.time.year}/5 年${
     state.player.practicalTrainingMonths > 0
-      ? `🌱 實務訓練剩 ${state.player.practicalTrainingMonths} 個月轉正`
-      : `本職級年資 ${state.player.monthsInRank} 個月`
+      ? `（實務訓練剩 ${state.player.practicalTrainingMonths} 月）`
+      : ''
   }
               </div>
             </div>
@@ -408,154 +361,54 @@ function renderMainGame(state: GameState) {
           </div>
         </div>
 
-        <!-- 2. Sticky Live Synchronized 4-Bar HUD (Always visible on mobile while clicking!) -->
-        <div class="live-hud-strip">
-          <!-- Primary KPI Mini Meter -->
-          <div class="hud-mini-card ${
-            doAnim && anim?.kind === 'work_primary' ? 'just-updated' : ''
-          }">
-            <div class="hud-mini-top">
-              <span class="hud-mini-label">ヘルメット 主KPI：${divDef.primaryKpi.label}</span>
-              <span class="hud-mini-val">
-                <strong id="hud-primary-num">${hudPrimaryInitVal}</strong>/${state.kpi.primaryTarget}${divDef.primaryKpi.unit}
-                ${
-                  doAnim && anim?.kind === 'work_primary' && sameMonthForKpi
-                    ? `<span class="hud-delta-tag up">+${anim.toValue - anim.fromValue}</span>`
-                    : pDone
-                    ? '✅'
-                    : ''
-                }
-              </span>
+        <!-- 2. Simplified Status & Progress Card -->
+        <div class="panel-box" style="margin-bottom: 12px;">
+          <div class="guidance-banner ${rec.urgency}" style="margin-bottom: 10px; padding: 8px 10px;">
+            <div class="guidance-reason" style="font-size: 0.88rem;">${rec.reason}</div>
+          </div>
+
+          <div class="meter-group" style="margin-bottom: 10px;">
+            <div class="meter-top">
+              <span>👷 主KPI：${divDef.primaryKpi.label} ${pDone ? '✅' : ''}</span>
+              <strong>${state.kpi.primaryProgress} / ${state.kpi.primaryTarget} ${divDef.primaryKpi.unit}</strong>
             </div>
-            <div class="hud-mini-track">
-              <div class="hud-mini-fill ${pDone ? 'kpi-done' : 'kpi'}" id="hud-primary-bar" style="width: ${hudPrimaryInitPct}%"></div>
+            <div class="meter-track">
+              <div class="meter-fill ${pDone ? 'kpi-done' : 'kpi'}" style="width: ${pPct}%"></div>
             </div>
           </div>
 
-          <!-- Secondary KPI Mini Meter -->
-          <div class="hud-mini-card ${
-            doAnim && anim?.kind === 'work_secondary' ? 'just-updated' : ''
-          }">
-            <div class="hud-mini-top">
-              <span class="hud-mini-label">📁 次KPI：${divDef.secondaryKpi.label}</span>
-              <span class="hud-mini-val">
-                <strong id="hud-secondary-num">${hudSecondaryInitVal}</strong>/${state.kpi.secondaryTarget}${divDef.secondaryKpi.unit}
-                ${
-                  doAnim && anim?.kind === 'work_secondary' && sameMonthForKpi
-                    ? `<span class="hud-delta-tag up">+${anim.toValue - anim.fromValue}</span>`
-                    : sDone
-                    ? '✅'
-                    : ''
-                }
-              </span>
+          <div class="meter-group" style="margin-bottom: 10px;">
+            <div class="meter-top">
+              <span>📁 次KPI：${divDef.secondaryKpi.label} ${sDone ? '✅' : ''}</span>
+              <strong>${state.kpi.secondaryProgress} / ${state.kpi.secondaryTarget} ${divDef.secondaryKpi.unit}</strong>
             </div>
-            <div class="hud-mini-track">
-              <div class="hud-mini-fill ${sDone ? 'kpi-done' : 'kpi'}" id="hud-secondary-bar" style="width: ${hudSecondaryInitPct}%"></div>
+            <div class="meter-track">
+              <div class="meter-fill ${sDone ? 'kpi-done' : 'kpi'}" style="width: ${sPct}%"></div>
             </div>
           </div>
 
-          <!-- Stress Mini Meter -->
-          <div class="hud-mini-card ${
-            doAnim && anim?.kind === 'rest' ? 'just-updated good-update' : ''
-          }">
-            <div class="hud-mini-top">
-              <span class="hud-mini-label">🧠 情緒負壓${penaltyActive ? '(減半!)' : ''}</span>
-              <span class="hud-mini-val">
-                <strong id="hud-stress-num">${hudStressInitPct}</strong>/100
-                ${
-                  doAnim && anim?.kind === 'rest'
-                    ? `<span class="hud-delta-tag relief">-${anim.fromValue - anim.toValue}✨</span>`
-                    : ''
-                }
-              </span>
+          <div class="meter-group" style="margin-bottom: 8px;">
+            <div class="meter-top">
+              <span>🧠 情緒負壓 ${penaltyActive ? '⚠️(滿70產出減半!)' : '(滿70減半/100結局)'}</span>
+              <strong style="color:${state.player.stress >= 70 ? 'var(--seal-red)' : 'inherit'}">${state.player.stress} / 100</strong>
             </div>
-            <div class="hud-mini-track">
-              <div class="hud-mini-fill ${stressClass}" id="hud-stress-bar" style="width: ${hudStressInitPct}%"></div>
+            <div class="meter-track">
+              <div class="meter-fill ${stressClass}" style="width: ${state.player.stress}%"></div>
             </div>
           </div>
 
-          <!-- Study Knowledge Mini Meter -->
-          <div class="hud-mini-card ${
-            doAnim && anim?.kind === 'study' ? 'just-updated good-update' : ''
-          }">
-            <div class="hud-mini-top">
-              <span class="hud-mini-label">📖 國考知識把握</span>
-              <span class="hud-mini-val">
-                ${
-                  canStudy
-                    ? `<strong id="hud-study-num">${hudStudyInitVal}</strong>%/60%`
-                    : '已轉正✅'
-                }
-                ${
-                  doAnim && anim?.kind === 'study'
-                    ? `<span class="hud-delta-tag study">+${anim.toValue - anim.fromValue}%</span>`
-                    : ''
-                }
-              </span>
-            </div>
-            <div class="hud-mini-track">
-              <div class="hud-mini-fill study" id="hud-study-bar" style="width: ${
-                canStudy ? hudStudyInitPct : 100
-              }%"></div>
-            </div>
+          <div class="compact-meta-row">
+            <span>📖 國考把握：<strong>${canStudy ? `${studyReadinessPct}% (上限60%)` : '已轉正免考'}</strong></span>
+            <span>📅 本月剩 <strong>${slotsLeft}</strong> 時段｜半年未達標：<strong style="color:${
+    state.halfYearFailedMonths >= 2 ? 'var(--seal-red)' : 'inherit'
+  }">${state.halfYearFailedMonths}/3</strong> 月</span>
           </div>
         </div>
 
-        <!-- 3. Immediate Dynamic Progress & Feedback Showcase (Right above buttons for mobile!) -->
-        ${
-          fb
-            ? `
-          <div class="feedback-showcase ${fb.tone}">
-            <div class="feedback-header">
-              <span class="feedback-badge">📢 上一時段行動結果（${fb.timeLabel}）</span>
-              <strong>${fb.actionTitle}</strong>
-            </div>
-
-            ${
-              anim
-                ? `
-              <div class="anim-progress-card">
-                <div class="anim-positive-banner ${anim.barTheme}">
-                  <span>${anim.positiveBanner}</span>
-                </div>
-                <div class="anim-bar-header">
-                  <span>${anim.label}</span>
-                  <span>
-                    <strong id="anim-counter-num" style="font-size:1.05rem;">${animInitialVal}</strong> / ${anim.maxValue} ${anim.unit}
-                    <span class="anim-delta-pill ${anim.barTheme}">${anim.deltaText}</span>
-                  </span>
-                </div>
-                <div class="anim-bar-track">
-                  ${
-                    anim.kind === 'rest'
-                      ? `<div class="anim-bar-ghost" id="anim-bar-ghost" style="width: ${animFromPct}%"></div>`
-                      : ''
-                  }
-                  <div class="anim-bar-fill ${anim.barTheme}" id="anim-bar-fill" style="width: ${animInitialPct}%"></div>
-                </div>
-              </div>`
-                : ''
-            }
-
-            ${fb.site ? `<div class="feedback-site">📍 ${fb.site}</div>` : ''}
-            <div class="feedback-detail">${fb.detail}</div>
-            ${fb.finding ? `<div class="feedback-finding">${fb.finding}</div>` : ''}
-            <div class="feedback-impact">📊 狀態總結：${fb.impactSummary}</div>
-          </div>`
-            : ''
-        }
-
-        <!-- 4. Clear Step-by-Step Guidance Banner -->
-        <div class="guidance-banner ${rec.urgency}">
-          <div class="guidance-step">👉 下一步行動指引（本月還剩 <strong>${slotsLeft}</strong> 個時段，完成KPI還需 <strong>${slotsNeeded}</strong> 格）</div>
-          <div class="guidance-reason">${rec.reason}</div>
-        </div>
-
-        <!-- 5. Action Buttons -->
-        <div class="panel-box action-stage">
-          <div class="panel-heading">
-            <span>⚡ 請點選本時段（${state.time.slot === 'AM' ? '上午' : '下午'}）要執行的行動</span>
-            <span style="font-size:0.78rem; color:var(--ink-secondary);">點擊後上方進度條將同步動態更新</span>
+        <!-- 3. Action Buttons -->
+        <div class="panel-box action-stage" style="margin-bottom: 12px;">
+          <div class="panel-heading" style="margin-bottom: 8px; padding-bottom: 6px;">
+            <span>⚡ 選擇本時段（${state.time.slot === 'AM' ? '上午' : '下午'}）行動</span>
           </div>
 
           <div class="actions-grid">
@@ -566,7 +419,6 @@ function renderMainGame(state: GameState) {
                       <span>⏳ 執行鎖定行程：${state.player.blockedReason}</span>
                       <span class="action-tag rec-badge">★ 必點推進</span>
                     </div>
-                    <div class="action-desc">因重大職災後續調查或國家考試下午場次，點擊此處推進本時段。</div>
                   </button>`
                 : rankDef.isManagement
                 ? `
@@ -576,14 +428,13 @@ function renderMainGame(state: GameState) {
                     <div class="action-title">
                       <span>📋 督導科室專案稽查</span>
                       <span class="action-tag ${pDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'mgmt_supervise' ? '★ 推薦｜' : ''}主KPI +${getEffectiveActionOutput(
+                        ${rec.actionId === 'mgmt_supervise' ? '★ 推薦｜' : ''}+${getEffectiveActionOutput(
                     state,
                     divDef.primaryKpi.perAction,
                     1.25
-                  )} ${divDef.primaryKpi.unit}
+                  )}${divDef.primaryKpi.unit}
                       </span>
                     </div>
-                    <div class="action-desc">核閱下屬報告並帶隊稽查（目前 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget}｜負壓 +5）</div>
                   </button>
                   <button class="action-card ${
                     rec.actionId === 'mgmt_coord' ? 'recommended' : ''
@@ -591,10 +442,9 @@ function renderMainGame(state: GameState) {
                     <div class="action-title">
                       <span>🏛️ 主持跨局處協調會</span>
                       <span class="action-tag ${sDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'mgmt_coord' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}
+                        ${rec.actionId === 'mgmt_coord' ? '★ 推薦｜' : ''}+${perSecondaryGain}${divDef.secondaryKpi.unit}
                       </span>
                     </div>
-                    <div class="action-desc">主持重大勞資工安專案會議（目前 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget}｜負壓 +5）</div>
                   </button>
                 `
                 : `
@@ -602,12 +452,11 @@ function renderMainGame(state: GameState) {
                     rec.actionId === 'primary_work' ? 'recommended' : ''
                   }" data-action="primary_work">
                     <div class="action-title">
-                      <span>ヘルメット ${divDef.primaryKpi.actionLabel}</span>
+                      <span>👷 ${divDef.primaryKpi.actionLabel}</span>
                       <span class="action-tag ${pDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'primary_work' ? '★ 推薦｜' : ''}主KPI +${perPrimaryGain} ${divDef.primaryKpi.unit}
+                        ${rec.actionId === 'primary_work' ? '★ 推薦｜' : ''}主KPI +${perPrimaryGain}${divDef.primaryKpi.unit}
                       </span>
                     </div>
-                    <div class="action-desc">${divDef.primaryKpi.actionDesc}（目前 ${state.kpi.primaryProgress}/${state.kpi.primaryTarget} ${divDef.primaryKpi.unit}）</div>
                   </button>
                   <button class="action-card ${
                     rec.actionId === 'secondary_work' ? 'recommended' : ''
@@ -615,10 +464,9 @@ function renderMainGame(state: GameState) {
                     <div class="action-title">
                       <span>📁 ${divDef.secondaryKpi.actionLabel}</span>
                       <span class="action-tag ${sDone ? 'done-tag' : ''}">
-                        ${rec.actionId === 'secondary_work' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain} ${divDef.secondaryKpi.unit}
+                        ${rec.actionId === 'secondary_work' ? '★ 推薦｜' : ''}次KPI +${perSecondaryGain}${divDef.secondaryKpi.unit}
                       </span>
                     </div>
-                    <div class="action-desc">${divDef.secondaryKpi.actionDesc}（目前 ${state.kpi.secondaryProgress}/${state.kpi.secondaryTarget} ${divDef.secondaryKpi.unit}）</div>
                   </button>
                 `
             }
@@ -632,10 +480,9 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>📖 偷懶看書（準備國考）</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}知識累積 +1~3%（目前把握 ${studyReadinessPct}%）
+                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}知識 +1~3%
                     </span>
                   </div>
-                  <div class="action-desc">累積法條與專業知識提升上榜率（最高 60%，考上才重置），本時段無 KPI 產出且不降壓。</div>
                 </button>`
                 : ''
             }
@@ -649,10 +496,9 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>☕ 茶水間摸魚喘息</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10 ✨（免突發事件）
+                      ${rec.actionId === 'relax_idle' ? '★ 推薦｜' : ''}負壓 -10 ✨
                     </span>
                   </div>
-                  <div class="action-desc">泡咖啡滑手機放空，快速釋放 10 點情緒負壓（<strong>保證不會觸發突發事件</strong>，但無 KPI 產出）。</div>
                 </button>
                 <button class="action-card ${
                   rec.actionId === 'take_leave' ? 'recommended' : ''
@@ -662,151 +508,40 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>🌴 請休特休假（剩 ${state.player.annualLeaveLeft} 格）</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -18 ☀️（免突發事件）
+                      ${rec.actionId === 'take_leave' ? '★ 推薦｜' : ''}負壓 -18 ☀️
                     </span>
                   </div>
-                  <div class="action-desc">大幅消除 18 點負壓且<strong>保證不被突發事件打斷</strong>（注意：不會調降本月 KPI 目標）。</div>
                 </button>`
                 : ''
             }
           </div>
         </div>
 
-        <!-- 6. Detailed Progress Dashboard (KPI + Stress + Exam) -->
-        <div class="dashboard-grid">
-          <!-- Left: Monthly KPI Progress -->
-          <div class="panel-box">
-            <div class="panel-heading">
-              <span>📊 本月（${state.time.month}月）詳細考評指標</span>
-              <span style="font-size:0.78rem; color:var(--ink-secondary);">
-                ${
-                  state.kpi.isTrainingMonth
-                    ? '職前訓練月免計KPI'
-                    : `本月剩 ${slotsLeft} 格時段`
-                }
-              </span>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>1. ${divDef.primaryKpi.label} ${pDone ? '✅ 已達標' : ''}</span>
-                <strong>${state.kpi.primaryProgress} / ${state.kpi.primaryTarget} ${divDef.primaryKpi.unit}</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${pDone ? 'kpi-done' : 'kpi'}" style="width: ${pPct}%"></div>
-              </div>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>2. ${divDef.secondaryKpi.label} ${sDone ? '✅ 已達標' : ''}</span>
-                <strong>${state.kpi.secondaryProgress} / ${state.kpi.secondaryTarget} ${divDef.secondaryKpi.unit}</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${sDone ? 'kpi-done' : 'kpi'}" style="width: ${sPct}%"></div>
-              </div>
-            </div>
-
-            <div style="margin-top: 12px; padding-top: 10px; border-top: 1px dashed var(--border-doc); font-size:0.84rem;">
-              <div style="display:flex; justify-content:space-between;">
-                <span>半年度考評容錯（累計 3 個月未達標即開除）：</span>
-                <strong style="color:${
-                  state.halfYearFailedMonths >= 2 ? 'var(--seal-red)' : 'var(--ink-primary)'
-                }">已未達標 ${state.halfYearFailedMonths} / 3 個月</strong>
-              </div>
-              <div class="halfyear-pills">
-                ${
-                  state.halfYearMonthResults.length === 0
-                    ? '<span style="font-size:0.78rem; color:var(--ink-muted);">本半年尚無已結算月份</span>'
-                    : state.halfYearMonthResults
-                        .map(
-                          (m) =>
-                            `<span class="month-pill ${m.passed ? 'pass' : 'fail'}">${m.month}月${
-                              m.exempt ? '免計' : m.passed ? '✓達標' : '✗未達標'
-                            }</span>`
-                        )
-                        .join('')
-                }
-              </div>
-            </div>
+        <!-- 4. Simple Compact Log List (簡單的紀錄) -->
+        <div class="panel-box">
+          <div class="panel-heading" style="margin-bottom: 6px; padding-bottom: 4px; font-size: 0.9rem;">
+            <span>📜 近期紀錄</span>
           </div>
-
-          <!-- Right: Stress & National Exam -->
-          <div class="panel-box">
-            <div class="panel-heading">
-              <span>🧠 情緒負壓與國考進度</span>
-              <span style="font-size:0.78rem; color:${
-                penaltyActive ? 'var(--seal-red)' : 'var(--ink-secondary)'
-              }; font-weight:700;">
-                ${penaltyActive ? '⚠️ 負壓≥70：工作產出減半！' : '每週自然恢復 -1'}
-              </span>
-            </div>
-
-            <div class="meter-group">
-              <div class="meter-top">
-                <span>情緒負壓（每次工作 +5～+6｜滿 70 減半｜滿 100 過勞結局）</span>
-                <strong style="color:${
-                  state.player.stress >= 70 ? 'var(--seal-red)' : 'inherit'
-                }">${state.player.stress} / 100</strong>
-              </div>
-              <div class="meter-track">
-                <div class="meter-fill ${stressClass}" style="width: ${state.player.stress}%"></div>
-              </div>
-            </div>
-
-            <div class="officer-strip" style="margin-bottom: 0; padding: 10px;">
-              <div class="officer-cell">
-                <span class="officer-label">國考知識累積量</span>
-                <span class="officer-value" style="font-size:0.86rem;">讀書加成 +${state.player.examBonus}%（${getStudyReadinessHint(state)}）</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">下次強制國考</span>
-                <span class="officer-value" style="font-size:0.86rem;">${nextExamText}</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">目前職級進度</span>
-                <span class="officer-value" style="font-size:0.86rem;">${rankDef.title} (Lv.${rankDef.level + 1}/8)</span>
-              </div>
-              <div class="officer-cell">
-                <span class="officer-label">長官好感 / 聲望</span>
-                <span class="officer-value" style="font-size:0.86rem;">${state.player.bossFavor} / ${state.player.reputation}</span>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <!-- 7. Collapsible History Log & Career Ladder -->
-        <details class="panel-box" style="margin-top: 10px;">
-          <summary style="cursor:pointer; font-weight:700; font-family:'Noto Serif TC', serif;">
-            📜 展開歷史差勤紀錄簿（共 ${state.logs.length} 筆）與完整職級階梯
-          </summary>
-          <div style="margin: 10px 0; padding: 8px; background: var(--bg-paper-alt); border-radius: 4px; font-size: 0.8rem;">
-            <strong>升遷階梯：</strong>
-            ${RANKS.map((r) =>
-              r.id === state.player.rankId
-                ? `<strong style="color:var(--seal-red);">【${r.title}】</strong>`
-                : r.title
-            ).join(' → ')}
-          </div>
-          <div class="log-list" style="margin-top: 10px;">
+          <div class="log-list" style="max-height: 135px;">
             ${state.logs
+              .slice(0, 8)
               .map(
                 (item) => `
               <div class="log-item ${item.tone ?? 'info'}">
-                <span class="log-time">[${item.timeLabel}]</span>
+                <span class="log-time">[${item.timeLabel.replace('民國', '')}]</span>
                 <span>${item.text}</span>
               </div>`
               )
               .join('')}
           </div>
-        </details>
+        </div>
       </div>
 
       ${renderActiveModalHtml(state)}
     </div>
   `;
 
-  // Trigger dynamic bar & number animations from old value -> new value!
+  // Trigger dynamic bar & number animations inside the Step Result Pop-up Modal!
   if (doAnim && anim) {
     shouldAnimateProgress = false;
     requestAnimationFrame(() => {
@@ -825,56 +560,6 @@ function renderMainGame(state: GameState) {
           anim.toValue,
           650
         );
-
-        // Also animate top HUD bars & numbers in sync!
-        if (anim.kind === 'work_primary' && sameMonthForKpi) {
-          const hudBar = document.getElementById('hud-primary-bar');
-          if (hudBar) hudBar.style.width = `${pPct}%`;
-          animateNumber(
-            document.getElementById('hud-primary-num'),
-            anim.fromValue,
-            state.kpi.primaryProgress,
-            650
-          );
-        } else if (anim.kind === 'work_secondary' && sameMonthForKpi) {
-          const hudBar = document.getElementById('hud-secondary-bar');
-          if (hudBar) hudBar.style.width = `${sPct}%`;
-          animateNumber(
-            document.getElementById('hud-secondary-num'),
-            anim.fromValue,
-            state.kpi.secondaryProgress,
-            650
-          );
-        } else if (anim.kind === 'rest') {
-          const hudBar = document.getElementById('hud-stress-bar');
-          if (hudBar) hudBar.style.width = `${state.player.stress}%`;
-          animateNumber(
-            document.getElementById('hud-stress-num'),
-            anim.fromValue,
-            state.player.stress,
-            650
-          );
-        } else if (anim.kind === 'study') {
-          const hudBar = document.getElementById('hud-study-bar');
-          if (hudBar) hudBar.style.width = `${studyBarPct}%`;
-          animateNumber(
-            document.getElementById('hud-study-num'),
-            anim.fromValue,
-            studyReadinessPct,
-            650
-          );
-        }
-
-        if (anim.secondaryStressFrom !== undefined) {
-          const hudStressBar = document.getElementById('hud-stress-bar');
-          if (hudStressBar) hudStressBar.style.width = `${state.player.stress}%`;
-          animateNumber(
-            document.getElementById('hud-stress-num'),
-            anim.secondaryStressFrom,
-            state.player.stress,
-            650
-          );
-        }
       });
     });
   }
@@ -887,6 +572,7 @@ function renderMainGame(state: GameState) {
 
   document.getElementById('btn-title')?.addEventListener('click', () => {
     saveAuto(state);
+    showStepResultPopup = false;
     currentState = null;
     render();
   });
@@ -902,28 +588,47 @@ function renderMainGame(state: GameState) {
       alert('【存檔槽 1】尚無紀錄！');
       return;
     }
+    showStepResultPopup = false;
     currentState = loaded;
     saveAuto(currentState);
     render();
   });
 
-  // Bind action buttons
+  // Bind action buttons -> Every step pops up the Step Result Modal (unless an event/exam modal opens first)
   document.querySelectorAll<HTMLButtonElement>('[data-action]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const actionId = btn.getAttribute('data-action') as ActionId;
-      shouldAnimateProgress = true;
       performSlotAction(state, actionId, false);
+      if (
+        state.activeModal?.type === 'event' ||
+        state.activeModal?.type === 'exam_choice'
+      ) {
+        showStepResultPopup = false;
+      } else {
+        showStepResultPopup = true;
+        shouldAnimateProgress = true;
+      }
       saveAuto(state);
       render();
     });
+  });
+
+  // Bind Step Result Pop-up confirm button
+  document.getElementById('btn-step-confirm')?.addEventListener('click', () => {
+    showStepResultPopup = false;
+    render();
   });
 
   // Bind modal choice buttons
   document.querySelectorAll<HTMLButtonElement>('[data-modal-choice]').forEach((btn) => {
     btn.addEventListener('click', () => {
       const idx = Number(btn.getAttribute('data-modal-choice') ?? '0');
-      shouldAnimateProgress = true;
+      const prevType = state.activeModal?.type;
       resolveActiveModalChoice(state, idx);
+      if (prevType === 'event' || prevType === 'exam_choice') {
+        showStepResultPopup = true;
+        shouldAnimateProgress = true;
+      }
       saveAuto(state);
       render();
     });
@@ -931,6 +636,78 @@ function renderMainGame(state: GameState) {
 }
 
 function renderActiveModalHtml(state: GameState): string {
+  // 1. If an action just executed, pop up the Step Result Modal first!
+  if (showStepResultPopup && state.lastFeedback) {
+    const fb = state.lastFeedback;
+    const anim = fb.progressAnim;
+    const animFromPct = anim
+      ? Math.min(100, Math.max(0, Math.round((anim.fromValue / Math.max(1, anim.maxValue)) * 100)))
+      : 0;
+    const animToPct = anim
+      ? Math.min(100, Math.max(0, Math.round((anim.toValue / Math.max(1, anim.maxValue)) * 100)))
+      : 0;
+    const animInitialPct = shouldAnimateProgress ? animFromPct : animToPct;
+    const animInitialVal = shouldAnimateProgress && anim ? anim.fromValue : anim?.toValue ?? 0;
+
+    return `
+      <div class="modal-backdrop">
+        <div class="modal-doc">
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:6px; margin-bottom:8px;">
+            <span class="modal-stamp">本時段行動結果</span>
+            <span style="font-size:0.8rem; color:var(--ink-secondary); font-weight:700;">${fb.timeLabel}</span>
+          </div>
+          <h3 class="modal-title" style="font-size:1.18rem; margin-bottom:10px;">${fb.actionTitle}</h3>
+
+          ${
+            anim
+              ? `
+            <div class="anim-progress-card">
+              <div class="anim-positive-banner ${anim.barTheme}">
+                <span>${anim.positiveBanner}</span>
+              </div>
+              <div class="anim-bar-header">
+                <span>${anim.label}</span>
+                <span>
+                  <strong id="anim-counter-num" style="font-size:1.05rem;">${animInitialVal}</strong> / ${anim.maxValue} ${anim.unit}
+                  <span class="anim-delta-pill ${anim.barTheme}">${anim.deltaText}</span>
+                </span>
+              </div>
+              <div class="anim-bar-track">
+                ${
+                  anim.kind === 'rest'
+                    ? `<div class="anim-bar-ghost" id="anim-bar-ghost" style="width: ${animFromPct}%"></div>`
+                    : ''
+                }
+                <div class="anim-bar-fill ${anim.barTheme}" id="anim-bar-fill" style="width: ${animInitialPct}%"></div>
+              </div>
+            </div>`
+              : ''
+          }
+
+          <div class="modal-body" style="margin-bottom:14px;">
+            ${fb.site ? `<div style="font-weight:700; margin-bottom:4px;">📍 ${fb.site}</div>` : ''}
+            <div style="line-height:1.6;">${fb.detail}</div>
+            ${
+              fb.finding
+                ? `<div style="margin-top:6px; font-weight:700; color:var(--seal-red);">${fb.finding}</div>`
+                : ''
+            }
+          </div>
+
+          <div class="choice-stack">
+            <button class="choice-btn" id="btn-step-confirm" style="text-align:center; background:var(--gov-navy); color:#fff; font-weight:700;">
+              ${
+                state.activeModal?.type === 'monthly_report'
+                  ? '📊 確認並查看本月績效結算單'
+                  : '✅ 確認（繼續下一時段）'
+              }
+            </button>
+          </div>
+        </div>
+      </div>
+    `;
+  }
+
   const modal = state.activeModal;
   if (!modal) return '';
 
