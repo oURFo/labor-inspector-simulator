@@ -210,4 +210,12 @@ describe('Labor Inspector Simulator Core Engine', () => {
     expect(/\d|%/.test(state.lastFeedback?.finding ?? '')).toBe(false);
     expect(/\d|%/.test(state.logs[0].text)).toBe(false);
   });
+
+  it('contains at least 62 random events (40+ newly added events) with unique IDs', async () => {
+    const eventsModule = await import('../src/data/events.json');
+    const list = eventsModule.default;
+    expect(list.length).toBeGreaterThanOrEqual(62);
+    const ids = new Set(list.map((e) => e.id));
+    expect(ids.size).toBe(list.length);
+  });
 });

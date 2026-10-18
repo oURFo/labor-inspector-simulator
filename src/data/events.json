@@ -506,5 +506,1478 @@
         }
       }
     ]
+  },
+  {
+    "id": "lc_dual_attendance_book",
+    "title": "查獲科技廠「AB雙套出勤卡鐘」",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "你在內湖園區某電子大廠查核出勤紀錄時，表面上全體準時18點下班，但一名工程師偷偷在茶水間塞給你一張紙條，提示去查地下室警衛室的門禁刷卡機與系統登入Log！",
+    "choices": [
+      {
+        "label": "突襲調閱警衛室門禁與電腦開機Log交叉比對（額外 +2 場績效，負壓 +6，聲望 +5）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "成功破獲科技大廠陰陽出勤紀錄，一舉揪出上百筆隱匿加班！"
+        }
+      },
+      {
+        "label": "僅依人資提供的書面打卡表備查結案（負壓 -2，聲望 -3）",
+        "effects": {
+          "stress": -2,
+          "reputation": -3,
+          "log": "未深究地下室門禁紀錄，照單全收人資提供的表面出勤表。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_bubble_tea_parttime",
+    "title": "連鎖手搖飲店工讀生「試用期扣薪」案",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "大學生檢舉商圈知名手搖飲店規定「前三天實習不計薪、打破量杯扣五百、遲到一分鐘扣五十元」。加盟主卻理直氣壯地說：「店規都有簽名同意啊！」",
+    "choices": [
+      {
+        "label": "當場依《勞基法》第22條及第26條開單並命限期返還工資（負壓 +3，聲望 +4）",
+        "effects": {
+          "stress": 3,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "嚴正糾正手搖飲店違法扣薪店規，替工讀生討回血汗錢。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_hospital_nurse_shift",
+    "title": "區域醫院急診護理師「花班」連上爭議",
+    "divisions": ["labor_conditions", "occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "護理工會具名檢舉北辰基督教醫院急診室排班違反輪班間隔11小時規定，且強迫護理師簽署「自願負時數積借休同意書」規避加班費。",
+    "choices": [
+      {
+        "label": "全面抽查全院護理站班表與護理紀錄單時間戳記（耗費心力，負壓 +7，額外 +2 單位進度）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": 7,
+          "reputation": 5,
+          "log": "深入稽查醫院畸形花班與負時數黑數，獲醫護基層高度肯定。"
+        }
+      },
+      {
+        "label": "僅抽查檢舉人單一部門班表即收隊（負壓 +2）",
+        "effects": {
+          "stress": 2,
+          "log": "僅就檢舉人所屬病房完成抽查，按表操課結案。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_bus_driver_overwork",
+    "title": "客運司機連開15小時疲勞駕駛稽查",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "國道客運發生擦撞事故後，你奉派前往客運總站抽查行車紀錄器大餅圖與派車單，發現業者把司機「待命洗車與保養時間」全部扣除不算工時！",
+    "choices": [
+      {
+        "label": "調取GPS行車軌跡逐筆還原真實工時並重罰（負壓 +5，聲望 +4，主管好感 +3）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "比對客運GPS與大餅圖揪出超時駕駛，守護公共交通安全。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_fake_contract_delivery",
+    "title": "假承攬真僱傭規避勞健保爭議",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "一家大型電商物流車隊要求所有司機簽署「承攬合約」，卻規定必須穿制服、固定時間打卡、請假還要扣罰違約金。司機發生車禍後公司翻臉不認帳。",
+    "choices": [
+      {
+        "label": "依人格、經濟、組織從屬性做成立體訪談筆錄認定僱傭關係（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "撰寫詳盡從屬性認定報告，戳破物流業者假承攬真僱傭伎倆。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_pregnant_discrimination",
+    "title": "懷孕女員工遭惡意調往偏遠倉庫",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "一名懷孕五個月的行政專員哭著來電申訴，公司得知她懷孕後，隔天就以「業務調整」為由將她調往郊區無冷氣的倉庫搬貨，意圖逼她自請離職。",
+    "choices": [
+      {
+        "label": "立即啟動母性保護與調職五原則專案查核（本月次要KPI目標 +1 件，負壓 +5，聲望 +5）",
+        "effects": {
+          "extraSecondaryTargetActions": 1,
+          "stress": 5,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "火速查辦懷孕歧視與違法調職案，成功保住孕婦勞工工作權。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_department_store_stand",
+    "title": "百貨公司專櫃小姐久站與禁止坐下稽查",
+    "divisions": ["labor_conditions", "occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "百貨週年慶期間，樓管嚴格禁止專櫃人員坐下休息，還派神秘客拍照扣點，導致多名櫃姐靜脈曲張與足底筋膜炎惡化。",
+    "choices": [
+      {
+        "label": "無預警突擊百貨賣場逐層查核座椅設置與連續站立規範（額外 +2 單位進度，負壓 +4）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": 4,
+          "reputation": 4,
+          "log": "突擊百貨週年慶現場，要求全面增設專櫃休息座椅。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_injection_molding_bypass",
+    "title": "塑膠射出機安全門被用磁鐵短接",
+    "divisions": ["general_industry", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "巡視五股塑膠加工廠時，你發現整排射出成型機的安全門微動開關竟都被師傅用強力磁鐵與膠帶綁死，機器在安全門敞開狀態下仍高速合模！",
+    "choices": [
+      {
+        "label": "當場拍照存證並責令立即拆除磁鐵復原連鎖迴路（負壓 +4，聲望 +3，主管好感 +2）",
+        "effects": {
+          "stress": 4,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "及時阻止塑膠射出機安全裝置短接歪風，避免斷指慘劇。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_forklift_speeding",
+    "title": "物流倉儲堆高機未繫安全帶甩尾險象",
+    "divisions": ["general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "大型生鮮冷鏈物流中心內，數台座式堆高機在視線死角高速穿梭，駕駛不僅沒戴安全帽、沒繫安全帶，貨叉上還直接站著一名理貨員升到三公尺高拿貨！",
+    "choices": [
+      {
+        "label": "吹哨喝止並依《職安法》對雇主及違規作業全面開罰（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "嚴格取締物流倉儲堆高機違規載人與未繫安全帶亂象。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_cold_storage_lock",
+    "title": "食品廠零下25度急凍庫警報器故障",
+    "divisions": ["general_industry", "occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "你在水產加工廠進行冷凍庫安全檢查，按壓庫內的緊急求救鈴竟完全沒響，且內部安全推柄結滿厚冰卡死！萬一勞工受困將活活凍死。",
+    "choices": [
+      {
+        "label": "立即開立停用改善通知並要求加裝雙重除霜警鈴（負壓 +3，聲望 +5）",
+        "effects": {
+          "stress": 3,
+          "reputation": 5,
+          "bossFavor": 2,
+          "log": "揪出零下25度冷凍庫求救鈴失效重大隱患，拯救潛在受困勞工。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_loto_electric_shock",
+    "title": "工廠維修配電盤未上鎖掛牌（LOTO）",
+    "divisions": ["general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "機電人員正在廠房搶修380V高壓馬達線路，總電源開關卻只貼了一張手寫便條紙「修理中勿動」，未上鎖也未拔除保險絲，另一名員工正伸手準備推上開關！",
+    "choices": [
+      {
+        "label": "大聲喝止！當場示範斷電上鎖掛牌標準程序並開單（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "千鈞一髮喝止誤送電行為，挽救一條機電維修工性命！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_rooftop_solar_panel",
+    "title": "廠房採光罩屋頂清洗作業無防墜踏板",
+    "divisions": ["general_industry", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "太陽能光電外包商正在五層樓高的工廠石綿瓦與塑鋼採光罩屋頂鋪設模組，勞工完全沒架設安全母索，也未鋪設30公分寬踏板，隨時可能踩穿採光罩墜落！",
+    "choices": [
+      {
+        "label": "立刻命全體人員撤下屋頂，開立高處墜落停工處分（負壓 +5，聲望 +4，主管好感 +3）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "勒令無防護屋頂光電作業立即停工，防範採光罩踏穿悲劇。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_mrt_tunnel_seepage",
+    "title": "捷運潛盾隧道聯絡通道滲水湧砂",
+    "divisions": ["civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "地下二十五公尺的捷運潛盾隧道聯絡通道開挖期間，冷凍工法冰牆局部融解出現湧水帶砂現象，地面道路監測儀器開始發出傾斜警示！",
+    "choices": [
+      {
+        "label": "深入地下隧道督導緊急灌漿止水與人員撤離（耗費本格與下一格，負壓 +11，主管好感 +5）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "blockNextSlots": 1,
+          "stress": 11,
+          "bossFavor": 5,
+          "reputation": 5,
+          "log": "進駐捷運潛盾隧道指揮湧水搶險，成功化解地層下陷危機。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_slope_landslide_rain",
+    "title": "山區擋土牆工程連日豪雨邊坡滑動",
+    "divisions": ["civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "連日梅雨過後，你前往山區道路拓寬工程稽查，發現上方邊坡已出現明顯張力裂縫與泥水滲出，工地卻為了趕工進度仍派怪手在坡腳開挖！",
+    "choices": [
+      {
+        "label": "強硬下達立即停工令並強制撤離坡腳所有機具人員（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "果斷撤離山區危險邊坡作業人員，半小時後土石果真崩落，全員逃過一劫！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_trench_collapse_risk",
+    "title": "污水管線深開挖溝槽未設擋土支撐",
+    "divisions": ["civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "市區道路自來水與污水管線推進工程，開挖深度達3.5公尺且土質鬆軟含水，包商卻省錢沒打鋼板樁擋土支撐，兩名工人正蹲在溝底接管！",
+    "choices": [
+      {
+        "label": "立刻叫工人爬出溝槽，依營造安全衛生設施標準開罰停工（負壓 +4，聲望 +4）",
+        "effects": {
+          "stress": 4,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "及時制止無擋土支撐深溝槽作業，防止砂土活埋意外。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_bridge_launching_wagon",
+    "title": "跨河大橋懸臂工作車錨定螺栓鬆脫",
+    "divisions": ["civil_eng", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "你在高空跨河大橋工地檢查懸臂推進工作車時，彎腰仔細查看軌道後錨定系統，赫然發現主錨定高拉力螺桿竟有兩根未鎖緊且缺少雙螺帽防鬆脫！",
+    "choices": [
+      {
+        "label": "嚴令停止混凝土澆置，待結構技師重新簽認錨定力後始得復工（負壓 +5，主管好感 +4）",
+        "effects": {
+          "stress": 5,
+          "bossFavor": 4,
+          "reputation": 4,
+          "log": "鷹眼揪出跨河大橋工作車錨定缺失，避免整座工作車翻落河床。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_elevator_shaft_opening",
+    "title": "建案18樓電梯井開口護欄遭私拆",
+    "divisions": ["building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "巡檢超高層住宅建案至18樓時，發現電梯直井開口原本設置的金屬護欄與安全網，被進場搬運建材的泥作小包整片拆掉丟在一旁，電梯井直通地下四樓深淵！",
+    "choices": [
+      {
+        "label": "對原事業單位與泥作承攬商一併重罰並命當場焊回護欄（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "重罰工地私拆電梯井護欄行為，盯著工班當場復原防護設施。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_formwork_shoring_buckling",
+    "title": "挑高大廳模板支撐未設水平繫條",
+    "divisions": ["building_eng", "civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "商辦大樓挑高七公尺大廳即將在下午進行頂版混凝土灌漿，你進場檢查卻發現可調鋼管支柱違規三支搭接，且完全未依結構計算書設置縱橫向水平繫條，灌漿必爆模坍塌！",
+    "choices": [
+      {
+        "label": "擋下門口預拌混凝土車，開立停工通知要求全面補強支撐（負壓 +7，聲望 +5，主管好感 +4）",
+        "effects": {
+          "stress": 7,
+          "reputation": 5,
+          "bossFavor": 4,
+          "log": "頂住營造廠跳腳抗議，擋下預拌車阻止挑高模板灌漿倒塌慘劇！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_gondola_high_wind",
+    "title": "大樓外牆洗窗吊籠遇七級強陣風",
+    "divisions": ["building_eng", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "午後刮起七級強陣風，市中心商辦大樓22樓外牆卻還有一具載人吊籠在空中剧烈搖晃貼磁磚，且作業勞工救生索竟直接扣在吊籠欄杆上而非獨立救生母索！",
+    "choices": [
+      {
+        "label": "衝上頂樓指揮將吊籠緩降收回並依法重罰（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "緊急救援強風中高空搖晃的外牆吊籠作業員。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_rebar_uncapped",
+    "title": "工地滿地裸露鋼筋未加裝防護套",
+    "divisions": ["building_eng", "civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "大型集合住宅工地二樓版面上，上千根垂直向上預留的鋼筋尖端完全沒套上塑膠防護帽，工人就在鋼筋叢林上方踩著單片跳板搬運模板！",
+    "choices": [
+      {
+        "label": "逐區拍照開罰並限期全面加裝鋼筋保護套與彎鉤（負壓 +3，聲望 +3）",
+        "effects": {
+          "stress": 3,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "嚴格查處工地裸露鋼筋刺傷危害，督促工地落實基礎防護。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_tower_crane_climbing",
+    "title": "30層高樓塔式起重機頂升作業稽查",
+    "divisions": ["machinery", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "摩天大樓工地今日進行塔式起重機（塔吊）高空爬升加節作業，你攀爬上百公尺高塔架查核，發現操作員與指揮手竟未同步對講機頻道，且風速計已經故障！",
+    "choices": [
+      {
+        "label": "下令暫停頂升作業，待風速計修復與通訊測試正常始准續行（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "爬上百米塔吊制止帶病頂升作業，確保高空極限工程安全。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_mobile_crane_outrigger",
+    "title": "移動式起重機外伸撐座未全伸展吊掛",
+    "divisions": ["machinery", "civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "街角巷弄工地一輛45噸螃蟹吊車為了不佔用車道，單側外伸撐座只伸出一半、底下也沒墊鐵板，正在吊掛重達8噸的H型鋼，車身已開始微微翹起！",
+    "choices": [
+      {
+        "label": "緊急吹哨要求放下荷件，全面封路重新全伸展撐座（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "當場阻止螃蟹吊車半伸撐座違規吊掛，化解吊臂翻覆壓毀民宅危機。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_boiler_safety_valve",
+    "title": "染整廠高壓蒸汽鍋爐安全閥鉛封遭破壞",
+    "divisions": ["machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "你在紡織染整廠鍋爐房檢查時，發現鍋爐壓力表指針已逼近紅線，而頂部兩座安全閥的調整螺絲鉛封竟被剪斷鎖死！廠務人員坦言：「怕它一直跳氣浪費蒸氣啦！」",
+    "choices": [
+      {
+        "label": "立刻下令洩壓停爐，吊扣合格證並移送重罰（負壓 +6，聲望 +5，主管好感 +4）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 4,
+          "log": "破獲染整廠私鎖高壓鍋爐安全閥玩命行為，拆除了工業區不定時炸彈！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_ndt_fake_film",
+    "title": "高壓氣體儲槽焊道X光非破壞檢測底片造假",
+    "divisions": ["machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "審查石化廠新建高壓球型儲槽竣工檢查資料時，你放在觀片燈上仔細比對，發現有五張不同焊道位置的X光射线檢測底片，氣孔瑕疵位置竟然一模一樣，疑似翻拍造假！",
+    "choices": [
+      {
+        "label": "退回竣工申請，移送代檢機構與廠商偽造文書罪嫌（耗費本格，負壓 +6，聲望 +6，主管好感 +5）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 6,
+          "reputation": 6,
+          "bossFavor": 5,
+          "log": "細心識破高壓儲槽X光底片翻拍造假案，震驚全國職安界！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_construction_lift_expired",
+    "title": "營建用提升機合格證逾期半年仍載人升降",
+    "divisions": ["machinery", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "工地外牆施工電梯（營建用提升機）車廂內貼的檢查合格證早已過期半年，鋼索斷絲毛邊清晰可見，卻還擠了十幾名工人上下樓！",
+    "choices": [
+      {
+        "label": "當場貼上停用封條並切斷控制箱電源開罰（負壓 +4，聲望 +3）",
+        "effects": {
+          "stress": 4,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "查封逾期未檢且鋼索斷絲之工地施工電梯。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_hydrofluoric_acid_leak",
+    "title": "半導體廠氫氟酸（化骨水）供應室偵測警報",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "科技園區晶圓代工廠化學品供應室傳出氫氟酸（HF）管線接頭微滲漏！你進場查核發現現場緊急沖淋洗眼器水壓不足，且救命解毒劑「六氟靈」與葡萄糖酸鈣凝膠竟已過期！",
+    "choices": [
+      {
+        "label": "勒令局部停工封鎖管線，命全面更換急救藥品與沖淋設備（負壓 +6，聲望 +5，主管好感 +3）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "嚴格查處半導體廠劇毒化骨水防護缺失，確保緊急應變防線。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_foundry_silicosis",
+    "title": "傳統鑄造廠游離二氧化矽粉塵超標案",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "走進老舊翻砂鑄造廠，空氣中瀰漫濃重矽砂粉塵，局部排氣集塵袋早已破損漏風，三名資深勞工的特殊粉塵健檢報告已出現第2型塵肺症陰影！",
+    "choices": [
+      {
+        "label": "開立限期改善與罰單，並強制要求雇主辦理健檢分級管理與配工作業（負壓 +4，聲望 +4）",
+        "effects": {
+          "stress": 4,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "查處鑄造廠粉塵危害並協助塵肺症異常勞工轉調低粉塵崗位。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_workplace_bullying_suicide",
+    "title": "客服中心主管言語霸凌導致員工重度憂鬱申訴",
+    "divisions": ["occ_health", "labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "電信客服中心員工檢舉部門襄理每天在早會公開羞辱未達標員工、強迫罰站背話術，多名員工出現恐慌症就醫，公司卻連「執行職務遭受不法侵害預防計畫」都沒訂定！",
+    "choices": [
+      {
+        "label": "進場查核不法侵害預防紀錄並訪談多名同仁作成裁處（本月次要KPI +1 件，負壓 +5，聲望 +4）",
+        "effects": {
+          "extraSecondaryTargetActions": 1,
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "查辦客服中心職場霸凌預防缺失，迫使企業啟動外部獨立調查委員會。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_electroplating_cyanide",
+    "title": "地下電鍍廠氰化物與強酸槽未分隔存放",
+    "divisions": ["occ_health", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "配合環保局聯合稽查鐵皮屋電鍍廠，你驚見劇毒的氰化鈉原料桶竟然就擺在鹽酸槽旁邊！一旦翻倒混合將立即產生致命氫氰酸毒氣！",
+    "choices": [
+      {
+        "label": "當場喝令立即隔離上鎖，並依特定化學物質危害預防標準重罰（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "及時阻止電鍍廠氰化物與強酸混放，化解劇毒氣體外洩危機！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_forging_noise_deaf",
+    "title": "螺絲鍛造廠102分貝巨響未落實聽力保護",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "螺絲成型鍛造廠內噪音計實測高達102分貝，說話必須貼著耳朵大吼，但現場噪音作業區既未標示、機台無減音罩，勞工也因為悶熱全沒戴耳塞！",
+    "choices": [
+      {
+        "label": "依超過90分貝未採工程控制與聽力保護計畫開單裁罰（負壓 +3，聲望 +3）",
+        "effects": {
+          "stress": 3,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "完成高噪音鍛造廠專案稽查，要求增設隔音罩與強制配戴防音防護具。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_1999_crazy_complainant",
+    "title": "職業檢舉人狂洗1999市民熱線投訴你",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "一名離職勞工因為不滿前東家沒被罰到倒閉，連續三天狂打1999市民熱線與市長信箱投訴你「勞檢員包庇資方、態度敷衍」，研考會連發三張紅單要你今天下班前寫專案簽呈回覆！",
+    "choices": [
+      {
+        "label": "深呼吸壓住怒火，引用法條與證據寫出萬言回覆公文（本格作廢，負壓 +7，主管好感 +2）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "stress": 7,
+          "bossFavor": 2,
+          "log": "耗費整整半天應付1999瘋狂檢舉人連環投訴公文，心累不已。"
+        }
+      },
+      {
+        "label": "直接打電話跟檢舉人據理力爭把話講清楚（保住本格，負壓 +5，聲望 -2）",
+        "effects": {
+          "stress": 5,
+          "reputation": -2,
+          "log": "與情緒激動的檢舉人在電話中大吵一架，雖然保住外勤時間但耳膜快震破了。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_ethics_office_audit",
+    "title": "政風室無預警抽查外勤差勤與油資核銷",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "政風室主任突然拿著GPS公務車軌跡與外勤簽到簿來到科室，逐一比對每位檢查員外出稽查的停留時間、里程數與加油發票是否有「順道辦私事或浮報差旅費」！",
+    "choices": [
+      {
+        "label": "坦蕩出示所有現場稽查時間戳記照片與里程紀錄（負壓 +3，主管好感 +3，降低貪瀆風險）",
+        "effects": {
+          "stress": 3,
+          "bossFavor": 3,
+          "corruption": -5,
+          "log": "通過政風室嚴格外勤差勤抽查，紀錄詳實獲政風主任肯定。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_scooter_flat_tire",
+    "title": "外勤途中公務機車在偏僻工業區爆胎",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "頂著大太陽騎車趕往偏遠工業區受檢廠的路上，後輪突然踩到鐵釘「砰」一聲爆胎！方圓兩公里內沒有機車行，距離下一個檢查點只剩二十分鐘。",
+    "choices": [
+      {
+        "label": "滿頭大汗推車找車行補胎後繼續趕場（本格檢查產出減半，負壓 +6）",
+        "effects": {
+          "outputMultiplier": 0.5,
+          "stress": 6,
+          "log": "外勤半路機車爆胎推車兩公里，狼狽不堪且檢查場次減半。"
+        }
+      },
+      {
+        "label": "自掏腰包叫計程車先衝去受檢廠保住進度（正常完成工作，負壓 +3，主管好感 +2）",
+        "effects": {
+          "stress": 3,
+          "bossFavor": 2,
+          "log": "自掏腰包搭計程車趕赴檢查現場，保住了今日全數稽查進度！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_tablet_battery_dead",
+    "title": "現場製作筆錄時平板電腦突然藍白畫面當機",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "你花了一個多小時好不容易問完廠長十幾項違規事實，正準備轉出電子檢查紀錄表讓對方簽名時，公務平板電腦突然藍白畫面重開機，剛剛打的字全部消失！",
+    "choices": [
+      {
+        "label": "強忍崩潰拿出備用紙本紀錄表手寫重抄一遍（負壓 +7，聲望 +2）",
+        "effects": {
+          "stress": 7,
+          "reputation": 2,
+          "log": "公務平板當機吃掉整份筆錄，只能當場手寫重抄到手指抽筋。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_boss_friend_of_mayor",
+    "title": "受檢董事長當場打電話給「局處高層」炫耀",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 5,
+    "text": "你走進一家知名建設與營造集團總部稽查，董事長看你年輕，冷笑一聲直接撥通電話開擴音：「喂！副座喔，你們勞檢處一個小檢查員來我這邊找碴啦，要不要跟他說兩句？」",
+    "choices": [
+      {
+        "label": "面不改色對著電話報告：「報告長官，本案全程開啟密錄器依法執行職務！」（負壓 +6，聲望 +6）",
+        "effects": {
+          "stress": 6,
+          "reputation": 6,
+          "bossFavor": 2,
+          "log": "一句『全程開啟密錄器』讓電話那頭瞬間掛斷，董事長臉色鐵青簽下會談紀錄！"
+        }
+      },
+      {
+        "label": "【黑暗紓壓】陪笑臉寒暄幾句，僅口頭勸導即收隊（負壓 -8，聲望 -6，累積貪瀆風險）",
+        "effects": {
+          "stress": -8,
+          "reputation": -6,
+          "corruption": 8,
+          "log": "忌憚高層人脈關係草草收隊，心裡雖然少了一樁麻煩但倍感屈辱。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_tv_reporter_ambush",
+    "title": "電視台SNG車記者衝進稽查現場堵麥",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 4,
+    "text": "你正在調查一起勞資爭議與工安申訴案，三家電視台記者突然扛著攝影機衝到現場，把麥克風嘟到你臉前：「請問勞檢處是不是之前就收到檢舉卻擺爛沒查？今天會罰多少錢？」",
+    "choices": [
+      {
+        "label": "沉著應對，引用《勞檢法》第11條保密義務與法定程序得體發言（負壓 +5，主管好感 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "bossFavor": 5,
+          "reputation": 4,
+          "log": "面對SNG鏡頭不卑不亢專業回應，晚間新聞播出後獲處長高度讚賞！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_labor_management_brawl",
+    "title": "勞資雙方在陪同檢查時當場大打出手",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "依規定通知工會代表陪同檢查時，廠務經理罵了一句「就是你們這些內鬼去告狀」，工會理事氣得當場掀桌揮拳，兩方人馬在會議室扭打成一團！",
+    "choices": [
+      {
+        "label": "一邊報警一邊上前隔開雙方完成筆錄（負壓 +8，聲望 +3，主管好感 +3）",
+        "effects": {
+          "stress": 8,
+          "reputation": 3,
+          "bossFavor": 3,
+          "log": "在勞資全武行混戰中驚險完成法定檢查程序，差點被波及挨揍。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_veteran_secret_notes",
+    "title": "屆退老師傅傳授「勞檢破案與國考法學秘笈」",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 3,
+    "weight": 4,
+    "text": "處裡服務滿三十五年的傳奇檢查員老林下個月要退休了，看你平時認真肯學，把一本泛黃的手寫筆記本塞給你：「這是我這輩子抓假帳冊的心法，還有歷年勞工行政與工安法規的必考爭點整理！」",
+    "choices": [
+      {
+        "label": "恭敬收下並泡壺好茶向老師傅請益（負壓 -5，提升國考準備狀態，額外 +1 單位進度）",
+        "effects": {
+          "bonusPrimaryRaw": 1,
+          "stress": -5,
+          "examBonus": 4,
+          "colleagueRelation": 4,
+          "log": "獲贈屆退老前輩三十五年功力秘笈，稽查技巧與法學實力同步精進！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_exam_law_amendment_seminar",
+    "title": "處內舉辦「最新職安法與勞基法修法實務講座」",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "人事室下午邀請了常擔任國家考試典試委員的大學法學教授來處裡專題演講，主題正好是今年剛修正的職安法裁罰基準與最新最高行政法院大法庭見解！",
+    "choices": [
+      {
+        "label": "報名參加講座並坐在第一排狂做筆記（耗費 1 格公假並調降KPI，提升國考準備狀態）",
+        "effects": {
+          "cancelCurrentSlot": true,
+          "officialLeaveSlots": 1,
+          "examBonus": 4,
+          "stress": -3,
+          "log": "參加典試委員法學實務講座，精準掌握最新修法考點！"
+        }
+      },
+      {
+        "label": "不去聽演講，照常外出跑檢查衝刺本月KPI（維持原定行動，主管好感 +2）",
+        "effects": {
+          "bossFavor": 2,
+          "log": "放棄修法講座專心跑外勤業務。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_office_chicken_cutlet_treat",
+    "title": "科長自掏腰包請全科吃厚切雞排與珍奶",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 7,
+    "weight": 5,
+    "text": "下午三點半，外送員突然推著兩大箱香噴噴的現炸厚切雞排與五十嵐波霸奶茶走進科室！科長笑著拍手：「大家這陣子跑專案辛苦了，吃完再繼續拚！」",
+    "choices": [
+      {
+        "label": "大口咬下熱騰騰的雞排配珍奶（負壓 -8，同事關係 +4）",
+        "effects": {
+          "stress": -8,
+          "colleagueRelation": 4,
+          "log": "享用科室團購雞排與珍奶下午茶，累積的疲勞瞬間消散大半！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_osha_annual_evaluation",
+    "title": "中央職安署年度勞動檢查機構績效考評",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 7,
+    "weight": 4,
+    "text": "勞動部職業安全衛生署考評委員蒞臨北辰市勞檢處進行年度業務書面與實地抽查，你的承辦卷宗正好被抽中作為示範案卷！",
+    "choices": [
+      {
+        "label": "徹夜將採證照片、談話筆錄與法條援引整理得完美無瑕（負壓 +5，主管好感 +6，聲望 +5）",
+        "effects": {
+          "stress": 5,
+          "bossFavor": 6,
+          "reputation": 5,
+          "log": "承辦案卷在中央職安署年度考評獲評為『全國優等範例』，處長龍心大悅！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_prosecutor_joint_raid",
+    "title": "地檢署檢察官指揮會同突擊搜索非法工廠",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "地檢署檢察官偵辦一起非法聘僱失聯移工與偽造職安紀錄案，清晨六點臨時調派勞檢處人員會同憲警持搜索票拂曉出擊！",
+    "choices": [
+      {
+        "label": "隨同檢警專案小組破門清查並扣押帳冊（額外 +3 單位主要KPI進度，負壓 +7，聲望 +5）",
+        "effects": {
+          "bonusPrimaryRaw": 3,
+          "stress": 7,
+          "reputation": 5,
+          "bossFavor": 4,
+          "log": "配合地檢署拂曉出擊破獲大型非法地下工廠，戰果輝煌！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_whistleblower_leaked",
+    "title": "受檢雇主逼問「到底是哪個員工檢舉的」",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "你到一家只有八名員工的小型設計公司進行申訴檢查，老闆娘盯著你的卷宗不斷套話：「我們公司這麼小，是不是上禮拜離職的小美去檢舉的？你跟大姊講實話，我不為難你！」",
+    "choices": [
+      {
+        "label": "嚴守《勞檢法》保密防線，改以『全公司通案抽查』方式掩護吹哨者（負壓 +4，聲望 +5）",
+        "effects": {
+          "stress": 4,
+          "reputation": 5,
+          "bossFavor": 2,
+          "log": "巧妙運用通案抽查技巧徹底保護檢舉勞工身分不外洩。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_audit_office_query",
+    "title": "審計處來函糾正「裁罰案件催繳率過低」",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 4,
+    "text": "審計處發來年度審核通知，質疑本處有多筆惡意欠繳罰鍰的違規廠商尚未移送行政執行署強制執行，要求限期清查歸檔！",
+    "choices": [
+      {
+        "label": "翻出歷年欠繳卷宗逐筆製作移送執行書（本月次要KPI目標 +1 件，負壓 +5，主管好感 +3）",
+        "effects": {
+          "extraSecondaryTargetActions": 1,
+          "stress": 5,
+          "bossFavor": 3,
+          "log": "清查陳年欠繳罰鍰案並移送行政執行署扣押廠商帳戶。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_foreign_student_illegal_work",
+    "title": "產學合作外籍生超時實習淪為廉價勞工案",
+    "divisions": ["labor_conditions", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "接獲通報某科技大學產學專班外籍學生被派往食品工廠上大夜班，每週工時超過40小時且被仲介抽成，教育部與勞動部要求專案聯查。",
+    "choices": [
+      {
+        "label": "夜間突擊工廠清查外籍生工作許可與大夜班工資清冊（負壓 +6，聲望 +5，額外 +2 單位進度）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "夜間突擊破獲外籍生違法超時大夜班案，斬斷黑心產學剝削鏈。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_severance_pay_calculation",
+    "title": "老員工新舊制年資混合資遣費算錯爭議",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "一名在傳統紡織廠工作二十五年的老領班被資遣，老闆只用底薪計算新制資遣費，把勞退舊制年資跟經常性津貼全部漏算，少給了將近八十萬元！",
+    "choices": [
+      {
+        "label": "逐月核算近六個月平均工資與新舊制基數，命雇主限期補足差額（負壓 +4，聲望 +5）",
+        "effects": {
+          "stress": 4,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "精準核算新舊制平均工資，替二十五年老員工追回八十萬退休救命錢！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_woodworking_saw_guard",
+    "title": "家具木工廠圓盤鋸未裝反撥預防齒與護罩",
+    "divisions": ["general_industry", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "系統家具工廠內木屑紛飛，五台手工送料圓盤鋸全部沒有裝設鋸齒接觸預防護罩與反撥預防裝置，老師傅還叼著菸徒手推木板過鋸片！",
+    "choices": [
+      {
+        "label": "當場開立缺失改善單並要求立即裝回撐縫片與護罩（負壓 +3，聲望 +3）",
+        "effects": {
+          "stress": 3,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "嚴格查處木工廠圓盤鋸無護罩違規，防範木材反撥傷人及斷指事故。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_ammonia_refrigeration_leak",
+    "title": "製冰廠液氨冷媒機房刺鼻氣體外洩",
+    "divisions": ["general_industry", "occ_health", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "前往港口大型製冰廠稽查時，還沒走進機房就聞到強烈刺鼻氨味！機房內氨氣偵測警報器電源竟被拔掉，且現場找不到任何氨氣專用防毒面具。",
+    "choices": [
+      {
+        "label": "立即疏散現場人員並勒令冷媒系統停機檢修（負壓 +6，聲望 +5，主管好感 +3）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "果斷處置製冰廠液氨冷媒外洩隱患，避免港區群體中毒災害。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_confined_space_manhole_rescue",
+    "title": "電信人孔抽水作業汽油發電機一氧化碳中毒",
+    "divisions": ["civil_eng", "occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "外包商在馬路電信人孔內抽水接纜，竟異想天開把小型汽油抽水機直接放進人孔內運轉！你經過時發現孔內工人臉色潮紅頭暈，一氧化碳偵測器瞬間狂叫破表！",
+    "choices": [
+      {
+        "label": "緊急將工人拉出人孔吹風給氧，並依局限空間違規重罰包商（負壓 +6，聲望 +6）",
+        "effects": {
+          "stress": 6,
+          "reputation": 6,
+          "bossFavor": 4,
+          "log": "巡檢途中機警救出人孔一氧化碳中毒工人，鬼門關前搶回兩條人命！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_retaining_wall_diaphragm",
+    "title": "深開挖基地連續壁抓斗吊索嚴重斷股",
+    "divisions": ["civil_eng", "building_eng", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "大型都更案正在施作地下連續壁工程，巨型MHL抓斗吊車正吊起數十噸重的鋼筋籠，你用望遠鏡卻看到主吊索已有一股明顯斷裂鬆散！",
+    "choices": [
+      {
+        "label": "立即吹哨清場，命令更換合格鋼索後始准繼續吊放鋼筋籠（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "及時發現連續壁巨型鋼筋籠吊索斷股，阻止數十噸鋼筋籠砸落事故。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_scaffolding_wall_tie_removed",
+    "title": "外牆貼磁磚工班私自拔除施工架壁連座",
+    "divisions": ["building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "大樓外牆正在進行拆架前洗石子與貼磚收尾，工人嫌壁連座（繫牆桿）擋手，竟把整面三層樓高的壁連座與交叉拉桿全部拔光，整座鷹架隨風前後晃動超過十公分！",
+    "choices": [
+      {
+        "label": "當場勒令外牆施工架全面停工，未補齊壁連座前嚴禁上人（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "強硬勒令私拔壁連座之搖晃外牆鷹架停工，杜絕倒塌風險。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_temporary_wiring_water",
+    "title": "工地地下室積水區臨時電線泡水漏電",
+    "divisions": ["building_eng", "civil_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "建案地下二樓雨後積水達腳踝深度，抽水馬達與移動式電焊機的破皮電纜線竟直接泡在水窪裡，且分電盤漏電斷路器（ELCB）被工地水電工拆掉跳線！",
+    "choices": [
+      {
+        "label": "要求立即拉斷總電源、架高電纜線並測試全場漏電斷路器（負壓 +4，聲望 +4）",
+        "effects": {
+          "stress": 4,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "徹底排除工地地下室積水泡電線之感電致命陷阱。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_forklift_unlicensed_worker",
+    "title": "工廠派無證照移工違規駕駛大型堆高機",
+    "divisions": ["machinery", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "你走進建材廠時，看到一名年輕移工正熟練地開著3.5噸堆高機鏟起水泥棧板，一看到你穿勞檢背心立刻跳車躲進廁所！廠長支支吾吾拿不出荷重一公噸以上堆高機操作人員結業證書。",
+    "choices": [
+      {
+        "label": "調閱廠區監視器畫面鎖定違規事實，依法裁罰雇主（負壓 +3，聲望 +3）",
+        "effects": {
+          "stress": 3,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "調閱監視器查獲無證駕駛堆高機違規，要求雇主落實專業操作訓練。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_autoclave_door_interlock",
+    "title": "橡膠加硫釜（第一種壓力容器）蓋門聯鎖故障",
+    "divisions": ["machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "輪胎橡膠廠的大型快速開蓋式加硫釜，殘壓連鎖裝置損壞，在釜內還有高壓高溫蒸氣時釜蓋竟然可以轉動打開，一旦誤開將瞬間噴飛爆炸！",
+    "choices": [
+      {
+        "label": "立即開立第一種壓力容器停用處分並通報代檢機構複查（負壓 +5，聲望 +5）",
+        "effects": {
+          "stress": 5,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "查封殘壓連鎖失效之大型橡膠加硫釜，防止蒸氣氣爆悲劇。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_lead_battery_blood_test",
+    "title": "鉛蓄電池回收廠勞工血中鉛濃度超標",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "職安署通報轄區一家鉛蓄電池極板熔煉廠，有四名勞工年度特殊健檢「血中鉛濃度」超過每百毫升40微克！你進場發現勞工竟直接穿著染鉛工作服在作業場所內吃便當。",
+    "choices": [
+      {
+        "label": "依《鉛中毒預防規則》重罰並命立即設置隔離餐廳、沐浴更衣室與排氣設備（負壓 +5，聲望 +5）",
+        "effects": {
+          "stress": 5,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "嚴查鉛蓄電池廠血鉛超標案，強制改善廠區排氣與衛生隔離設施。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_asbestos_roof_demolition",
+    "title": "老舊廠房拆除石綿瓦未濕潤且無呼吸防護",
+    "divisions": ["occ_health", "building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "舊工業區廠房拆除工地，工人拿著大鐵鎚直接敲碎含致癌石綿的波浪瓦並從三樓往下丟，現場完全未灑水濕潤，工人只戴著一般棉布口罩吸入大量石綿纖維！",
+    "choices": [
+      {
+        "label": "當場勒令停工！命依規定穿戴防護衣、防塵面具並妥善封存石綿廢棄物（負壓 +5，聲望 +5）",
+        "effects": {
+          "stress": 5,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "即時制止暴力乾式敲除致癌石綿瓦作業，守護勞工與周邊居民肺部健康。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_ergonomic_warehouse_back",
+    "title": "大型電商物流理貨員人因性肌肉骨骼傷病群聚",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "電商雙11購物節過後，物流中心十幾名理貨員集體出現椎間盤突出與腕隧道症候群，查核發現輸送帶高度設計不良，且單人每日彎腰搬運逾25公斤重物上千次！",
+    "choices": [
+      {
+        "label": "使用KIM人因工程評估表實測，命雇主增設省力升降台車與調整工作台高度（負壓 +4，聲望 +4）",
+        "effects": {
+          "stress": 4,
+          "reputation": 4,
+          "bossFavor": 2,
+          "log": "完成電商物流中心人因性危害專案評估，督促導入省力搬運輔助設備。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_fake_inspector_scam",
+    "title": "轄區出現「假冒勞檢員推銷天價滅火器與職安教材」",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "多家中小企業打電話到處裡詢問：「昨天有個自稱勞檢處專員的人來檢查，說不買他們指定的三萬元職安法規教材跟滅火器就要開罰三十萬，是真的嗎？」",
+    "choices": [
+      {
+        "label": "立即會同轄區派出所埋伏，當場逮獲假冒公務員詐騙集團（負壓 +4，聲望 +6，主管好感 +4）",
+        "effects": {
+          "stress": 4,
+          "reputation": 6,
+          "bossFavor": 4,
+          "log": "配合警方設局活逮假冒勞檢員詐騙集團，挽回機關清譽！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_false_fire_alarm_evacuation",
+    "title": "勞檢處大樓火警鈴誤鳴緊急疏散",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 7,
+    "weight": 3,
+    "text": "正在辦公室趕寫裁處書時，整棟合署辦公大樓火警受信總機突然警鈴大作！全處三百多人抱著公文袋從樓梯衝到一樓廣場，結果是地下室餐廳烤焦吐司觸發偵煙器。",
+    "choices": [
+      {
+        "label": "站在廣場樹蔭下跟同事聊天透透氣再上樓（負壓 -4，同事關係 +3）",
+        "effects": {
+          "stress": -4,
+          "colleagueRelation": 3,
+          "log": "火警烏龍疏散意外獲得半小時放風時間，跟同事在廣場相談甚歡。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_archive_room_treasure",
+    "title": "整理地下室檔案庫房翻出歷年勝訴答辯狀範本",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "奉命去地下室檔案室清點銷毀逾期公文時，你在角落發現一整箱歷任法制室主任與王牌檢查員撰寫的「訴願與行政訴訟常勝答辯狀彙編」，論理精闢至極！",
+    "choices": [
+      {
+        "label": "如獲至寶！借回座位仔細研讀法條攻防邏輯（負壓 -2，提升國考準備狀態）",
+        "effects": {
+          "stress": -2,
+          "examBonus": 3,
+          "bossFavor": 2,
+          "log": "從檔案庫房挖出歷年行政訴訟常勝答辯狀寶典，法學申論功力大增！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_internship_mentoring",
+    "title": "帶領新進實習檢查員見習外勤稽查",
+    "divisions": ["all"],
+    "minRankLevel": 1,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "科長指派一名剛報到的菜鳥實習生跟著你外出見習。菜鳥滿腔熱血但緊張得連檢查證都拿反，不斷問你各種現場蒐證與法條適用的問題。",
+    "choices": [
+      {
+        "label": "傾囊相授帶著他實戰演練，同時複習自身法學觀念（負壓 +2，同事關係 +5，提升國考準備狀態）",
+        "effects": {
+          "stress": 2,
+          "colleagueRelation": 5,
+          "bossFavor": 3,
+          "examBonus": 2,
+          "log": "教學相長！耐心指導新進實習生完成現場稽查，自身法條架構也更加清晰。"
+        }
+      },
+      {
+        "label": "叫實習生幫你背相機、拿卷宗、打字輸入紀錄（本格產出 ×1.5 倍，負壓 -3）",
+        "effects": {
+          "outputMultiplier": 1.5,
+          "stress": -3,
+          "log": "有實習生幫忙跑腿打字與拍照，今日外勤稽查速度飛快！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "all_union_banner_praise",
+    "title": "產業總工會致贈「勞工靠山」錦旗",
+    "divisions": ["all"],
+    "minRankLevel": 0,
+    "maxRankLevel": 6,
+    "weight": 4,
+    "text": "北辰市產業總工會理事長率領十幾名工會幹部來到勞檢處，敲鑼打鼓送上一面繡著「鐵面無私・勞工靠山」的紅絨錦旗，感謝你先前不畏資方施壓徹查違法。",
+    "choices": [
+      {
+        "label": "與處長一同代表受贈合影（負壓 -7，聲望 +6，主管好感 +4）",
+        "effects": {
+          "stress": -7,
+          "reputation": 6,
+          "bossFavor": 4,
+          "log": "獲產業總工會公開致贈『勞工靠山』錦旗，全處引以為榮！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mgmt_budget_car_war",
+    "title": "【主管角力】處務會議搶奪年度公務車與加班費預算",
+    "divisions": ["all"],
+    "minRankLevel": 5,
+    "maxRankLevel": 7,
+    "weight": 5,
+    "text": "年度預算分配會議上，會計室宣布今年外勤公務車汰換與超勤加班費預算統刪一成五，各科科長紛紛拍桌爭搶配額，眼看你們科的額度就要被砍！",
+    "choices": [
+      {
+        "label": "攤開全科外勤里程與專案件數圖表據理力爭，保住全額預算（負壓 +6，同事關係 +6，額外 +2 進度）",
+        "effects": {
+          "bonusPrimaryRaw": 2,
+          "stress": 6,
+          "colleagueRelation": 6,
+          "bossFavor": 3,
+          "log": "在處務會議霸氣護航科內預算與公務車配額，全科同仁士氣大振！"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mgmt_ace_inspector_resign",
+    "title": "【主管危機】科內王牌檢查員萌生退意遞出辭呈",
+    "divisions": ["all"],
+    "minRankLevel": 5,
+    "maxRankLevel": 7,
+    "weight": 5,
+    "text": "科裡辦案最得力的年輕技士因為長期被刁民檢舉與高壓專案折磨，紅著眼眶把辭職簽呈放在你桌上：「長官，我真的撐不下去了，想去業界當環安衛工程師……」",
+    "choices": [
+      {
+        "label": "親自幫他扛下兩件最棘手的專案並准他連休特休假充電（負壓 +8，同事關係 +8，聲望 +4）",
+        "effects": {
+          "stress": 8,
+          "colleagueRelation": 8,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "展現肩膀替下屬扛下棘手爛攤子，成功慰留科內王牌戰力！"
+        }
+      },
+      {
+        "label": "直接批示准辭，把他的未結案件平分給其他同仁（本月主要KPI目標 +1 格，同事關係 -6）",
+        "effects": {
+          "extraPrimaryTargetActions": 1,
+          "colleagueRelation": -6,
+          "stress": 3,
+          "log": "王牌下屬離職導致科室人力吃緊，全員分攤遺留案件。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "lc_crypto_salary_dispute",
+    "title": "新創區塊鏈公司用「空氣虛擬幣」發放半數薪資",
+    "divisions": ["labor_conditions"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "一群年輕工程師申訴某Web3新創公司發薪日只匯了一半新台幣，另一半竟發放公司自創、在交易所完全無法變現的「空氣代幣」，違反法定通用貨幣給付原則！",
+    "choices": [
+      {
+        "label": "依《勞基法》第22條工資應以法定通用貨幣給付開罰並命補發新台幣（負壓 +4，聲望 +5）",
+        "effects": {
+          "stress": 4,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "裁罰以空氣虛擬幣抵充薪資之新創公司，替工程師追回真金白銀。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "gi_robot_arm_safety_fence",
+    "title": "自動化焊接機械手臂安全光柵遭感應遮蔽",
+    "divisions": ["general_industry", "machinery"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "汽車零件廠的六軸工業機械手臂作業區，現場班長為了方便隨時進去拿取工件，竟拿黑色膠布把紅外線安全光柵貼住，機械手臂在人員進入時仍以全速揮舞！",
+    "choices": [
+      {
+        "label": "立即拍下急停按鈕，撕除膠布並依《工業用機器人危害預防標準》開罰（負壓 +5，聲望 +4）",
+        "effects": {
+          "stress": 5,
+          "reputation": 4,
+          "bossFavor": 3,
+          "log": "及時阻止六軸機械手臂安全光柵遮蔽違規，防止勞工遭機械臂重擊。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "ce_underwater_diving_bridge",
+    "title": "跨海大橋橋墩水下焊接異常氣壓潛水稽查",
+    "divisions": ["civil_eng", "occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "港區橋墩水下補強工程進行潛水作業，你登船查核發現工作船上竟未設置減壓艙、無連絡員守視供氣管線，且潛水夫昨日已出現關節痠痛的減壓症（潛水夫病）前兆！",
+    "choices": [
+      {
+        "label": "勒令水下作業即刻停工，強制將潛水夫送往高壓氧治療中心（負壓 +6，聲望 +5）",
+        "effects": {
+          "stress": 6,
+          "reputation": 5,
+          "bossFavor": 4,
+          "log": "嚴查異常氣壓水下潛水工程缺失，及時挽救潛水夫免於減壓症癱瘓。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "be_mobile_scaffold_no_wheel_lock",
+    "title": "裝修工地水電工站在未鎖輪移動式施工架上滑行",
+    "divisions": ["building_eng"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 5,
+    "text": "商場室內裝修工地，兩名水電工站在三公尺高的移動式施工架（活動鷹架）頂板上拉天花板管線，腳輪沒鎖剎車、沒裝外伸穩定腳，兩人竟還用腳蹬著天花板讓鷹架邊滑邊做！",
+    "choices": [
+      {
+        "label": "當場喝令下來鎖死腳輪、加裝外伸撐座與上下爬梯並開單（負壓 +3，聲望 +3）",
+        "effects": {
+          "stress": 3,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "糾正室內裝修工地站在活動鷹架上『溜冰』的危險特技行為。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "mc_grinding_wheel_burst",
+    "title": "金屬研磨廠砂輪機未裝護罩且超速運轉",
+    "divisions": ["machinery", "general_industry"],
+    "minRankLevel": 0,
+    "maxRankLevel": 4,
+    "weight": 4,
+    "text": "五金加工廠內，工人為了打磨大型鑄件死角，竟把高速砂輪機的鐵製護罩整個拆掉，且換上的砂輪片最高容許轉速低於馬達轉速，隨時可能高速破裂射出碎片！",
+    "choices": [
+      {
+        "label": "命令立刻停機更換符合轉速規格砂輪片並裝回護罩（負壓 +4，聲望 +3）",
+        "effects": {
+          "stress": 4,
+          "reputation": 3,
+          "bossFavor": 2,
+          "log": "查獲砂輪機拆護罩且超速運轉違規，消弭砂輪爆裂飛散風險。"
+        }
+      }
+    ]
+  },
+  {
+    "id": "oh_hospital_chemotherapy_hood",
+    "title": "綜合醫院化療藥品調配生物安全櫃風速不足",
+    "divisions": ["occ_health"],
+    "minRankLevel": 0,
+    "maxRankLevel": 5,
+    "weight": 4,
+    "text": "你攜帶熱線式風速計前往醫院藥劑部檢測抗癌化療藥物調配室，發現生物安全櫃（BSC）濾網早已阻塞，表面風速不到標準值的一半，致突變性藥霧正微幅外逸！",
+    "choices": [
+      {
+        "label": "開立限期改善通知，命立即更換HEPA濾網並重新校正風速（負壓 +4，聲望 +5）",
+        "effects": {
+          "stress": 4,
+          "reputation": 5,
+          "bossFavor": 3,
+          "log": "精密實測揪出醫院化療調配櫃風速不足，守護藥師免受致癌藥霧侵害。"
+        }
+      }
+    ]
   }
 ]
