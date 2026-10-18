@@ -9,7 +9,7 @@
       "label": "一般勞動檢查",
       "unit": "場",
       "perAction": 4,
-      "monthlyTarget": 16,
+      "monthlyTarget": 18,
       "actionLabel": "實地勞動條件檢查",
       "actionDesc": "前往事業單位抽查出勤紀錄、工資清冊與加班費給付情形（每格基礎 4 場，情緒負壓 +5）"
     },
@@ -33,7 +33,7 @@
       "label": "製造業職安檢查",
       "unit": "場",
       "perAction": 3,
-      "monthlyTarget": 12,
+      "monthlyTarget": 14,
       "actionLabel": "工廠職安衛實地檢查",
       "actionDesc": "稽查製造業廠房機械護罩、危害標示與安全衛生管理（每格基礎 3 場，情緒負壓 +5）"
     },
@@ -57,7 +57,7 @@
       "label": "土木工地檢查",
       "unit": "處",
       "perAction": 3,
-      "monthlyTarget": 12,
+      "monthlyTarget": 14,
       "actionLabel": "土木公共工程工地檢查",
       "actionDesc": "巡檢橋梁隧道、管線開挖與擋土支撐等高風險工地（每格基礎 3 處，情緒負壓 +5）"
     },
@@ -81,7 +81,7 @@
       "label": "建築工地檢查",
       "unit": "處",
       "perAction": 3,
-      "monthlyTarget": 12,
+      "monthlyTarget": 14,
       "actionLabel": "建築工地高處作業檢查",
       "actionDesc": "稽查大樓新建工程之施工架、開口護欄、安全網及防墜設施（每格基礎 3 處，情緒負壓 +5）"
     },
@@ -105,7 +105,7 @@
       "label": "危機設備檢查",
       "unit": "台",
       "perAction": 4,
-      "monthlyTarget": 16,
+      "monthlyTarget": 18,
       "actionLabel": "危險性機械設備實地檢查",
       "actionDesc": "執行塔吊、起重機、鍋爐及壓力容器定期檢查與現場測試（每格基礎 4 台，情緒負壓 +5）"
     },
@@ -129,7 +129,7 @@
       "label": "職業衛生專案檢查",
       "unit": "場",
       "perAction": 2,
-      "monthlyTarget": 8,
+      "monthlyTarget": 9,
       "actionLabel": "作業環境與化學品採樣檢查",
       "actionDesc": "攜帶採樣儀器赴廠區執行有機溶劑、特定化學物質及通風設備檢查（每格基礎 2 場，情緒負壓 +5）"
     },

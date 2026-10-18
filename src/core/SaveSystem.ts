@@ -41,8 +41,10 @@ function migrateState(raw: unknown): GameState | null {
       ...fallback.kpi,
       ...s.kpi,
       primaryTarget:
-        typeof s.kpi.primaryTarget === 'number' && !s.kpi.isTrainingMonth
-          ? Math.min(s.kpi.primaryTarget, baseMaxPrimary)
+        typeof s.kpi.primaryTarget === 'number' &&
+        !s.kpi.isTrainingMonth &&
+        !s.kpi.officialLeaveSlots
+          ? baseMaxPrimary
           : (s.kpi.primaryTarget ?? fallback.kpi.primaryTarget),
       highlightCases: Array.isArray(s.kpi.highlightCases) ? s.kpi.highlightCases : [],
     },

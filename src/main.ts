@@ -67,7 +67,7 @@ function renderTitleScreen() {
         <div class="panel-box" style="margin-bottom: 16px; background: var(--bg-paper-alt);">
           <div class="panel-heading">📌 4 句話看懂怎麼玩</div>
           <ol style="padding-left: 20px; font-size: 0.92rem; display: flex; flex-direction: column; gap: 6px;">
-            <li><strong>先看每月進度條</strong>：每個月有 8 個時段（4 週 × 上下午），通常做 <strong>5 次工作</strong>（4 主 + 1 次）就能把本月兩項 KPI 填滿達標。</li>
+            <li><strong>先看每月進度條</strong>：每個月有 8 個時段（4 週 × 上下午），每月兩項 KPI 目標約需 <strong>5.5 格工作量</strong>（4.5 格主KPI + 1 格次KPI）即可達標。</li>
             <li><strong>有多餘時段再偷看書</strong>：偷看書不會被抓，但會少做工作；<strong>半年內只要有 3 個月沒達標就會被開除！</strong></li>
             <li><strong>注意情緒負壓</strong>：每次外出稽查與辦案都會累積負壓（+5～+6），<strong>偷看書不會降壓</strong>，負壓快到 70 時記得按「摸魚」或「休假（-25）」喘口氣。</li>
             <li><strong>小心突發事件</strong>：目前每格工作或看書有 <strong>26% 機率</strong>遇到工安意外、前輩甩鍋、議員關說或塞紅包（摸魚與休假不會觸發突發事件）！</li>

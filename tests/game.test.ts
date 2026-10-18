@@ -30,23 +30,23 @@ describe('Labor Inspector Simulator Core Engine', () => {
     expect(state.endingId).toBe('eternal_contract');
   });
 
-  it('evaluates monthly KPI strictly with 5/8 slots target (16/16 primary + 1/1 secondary = 5 slots)', () => {
+  it('evaluates monthly KPI strictly with 5.5/8 slots target (18/18 primary + 1/1 secondary = 5.5 slots)', () => {
     const state = createInitialGameState('測試員', 'labor_conditions', 100);
     const rng = createRng(100);
-    // Advance past Month 1 (training month) into Month 2 so normal 5/8 KPI targets are initialized
+    // Advance past Month 1 (training month) into Month 2 so normal 5.5/8 KPI targets are initialized
     for (let i = 0; i < 8; i++) {
       advanceClockOneSlot(state, rng);
     }
     expect(state.kpi.isTrainingMonth).toBe(false);
-    // Default labor_conditions target is now 16 (4 slots * 4 cases) + 1 secondary (1 slot) = 5/8 slots
-    expect(state.kpi.primaryTarget).toBe(16);
+    // Default labor_conditions target is now 18 (4.5 slots * 4 cases) + 1 secondary (1 slot) = 5.5/8 slots
+    expect(state.kpi.primaryTarget).toBe(18);
     expect(state.kpi.secondaryTarget).toBe(1);
 
-    state.kpi.primaryProgress = 12;
+    state.kpi.primaryProgress = 16;
     state.kpi.secondaryProgress = 1;
     expect(isCurrentMonthKpiPassed(state)).toBe(false);
 
-    state.kpi.primaryProgress = 16;
+    state.kpi.primaryProgress = 18;
     expect(isCurrentMonthKpiPassed(state)).toBe(true);
 
     // Verify take_leave reduces stress by 25
@@ -58,12 +58,12 @@ describe('Labor Inspector Simulator Core Engine', () => {
   it('applies proportional KPI reduction only for official leave slots', () => {
     const state = createInitialGameState('測試員', 'labor_conditions', 100);
     state.kpi.isTrainingMonth = false;
-    state.kpi.primaryTarget = 16;
+    state.kpi.primaryTarget = 18;
     state.kpi.secondaryTarget = 1;
 
     applyOfficialLeaveKpiReduction(state, 2);
-    // 6/8 of 16 = 12
-    expect(state.kpi.primaryTarget).toBe(12);
+    // floor(6/8 of 18) = floor(13.5) = 13
+    expect(state.kpi.primaryTarget).toBe(13);
   });
 
   it('halves work output when stress >= 70 and triggers burnout at 100', () => {
