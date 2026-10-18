@@ -103,17 +103,24 @@ export function getExamPassRatePercent(state: GameState, kind: ExamKind): number
   return clamp(base + state.player.examBonus, 5, 60);
 }
 
+export function getStudyStageText(bonus: number): string {
+  if (bonus >= 50) return '登峰造極（法條與實務見解爐火純青）';
+  if (bonus >= 42) return '胸有成竹（重要爭點滾瓜爛熟）';
+  if (bonus >= 34) return '融會貫通（申論三段論法架構清晰）';
+  if (bonus >= 26) return '駕輕就熟（歷屆考古題得心應手）';
+  if (bonus >= 19) return '漸入佳境（選擇題與法規逐漸上手）';
+  if (bonus >= 12) return '略有所成（基本考點已有概念）';
+  if (bonus >= 6) return '粗通皮毛（記住部分基礎法條）';
+  if (bonus >= 1) return '初翻法典（剛開始畫螢光筆重點）';
+  return '毫無頭緒（完全裸考狀態）';
+}
+
 /**
  * Qualitative study readiness hint for UI (since exact % is hidden)
  */
 export function getStudyReadinessHint(state: GameState): string {
-  const b = state.player.examBonus;
   if (!needsExamForSpecialist(state)) return '已具薦任資格（免試）';
-  if (b >= 45) return '胸有成竹（法條滾瓜爛熟）';
-  if (b >= 30) return '漸入佳境（歷屆試題得心應手）';
-  if (b >= 15) return '略有所成（基本爭點已有概念）';
-  if (b >= 5) return '剛翻幾頁（法典還很新）';
-  return '毫無頭緒（裸考狀態）';
+  return getStudyStageText(state.player.examBonus);
 }
 
 export function getRemainingSlotsInMonth(state: GameState): number {
@@ -315,42 +322,50 @@ export function executeActionEffect(
       const bonus = rng.nextInt(1, 3);
       state.player.examBonus = clamp(state.player.examBonus + bonus, 0, 55);
       const afterBonus = state.player.examBonus;
+      const beforeStage = getStudyStageText(beforeBonus);
+      const afterStage = getStudyStageText(afterBonus);
       const fromRate = Math.min(60, 10 + beforeBonus);
       const toRate = Math.min(60, 10 + afterBonus);
 
-      const studyEncouragePool = [
-        `✨ 知識吸收大有斬獲！艱澀的法條爭點瞬間融會貫通，國考實力 +${bonus}%！`,
-        `📚 苦讀沒有白費！考古題解題速度明顯提升，累計知識加成達 +${afterBonus}%！`,
-        `💡 腦中法學架構越來越清晰！離金榜題名轉任正式公務員又近了一大步（+${bonus}%）！`,
-      ];
-      const posBanner =
+      const gainDesc =
         afterBonus >= 50
-          ? `🏆 知識儲備已達巔峰！國考上榜把握度已達最高上限 60%（累計加成 +${afterBonus}%）！`
-          : rng.pick(studyEncouragePool);
+          ? '🏆 讀書心得已臻化境！法條與實務見解在腦中完全融會貫通，隨時準備好上考場一戰！'
+          : bonus === 3
+          ? '💡 醍醐灌頂！今日讀書狀態極佳，原本卡關的申論題爭點瞬間豁然開朗，法學實力大幅精進！'
+          : bonus === 2
+          ? '✨ 頗有斬獲！把容易混淆的勞檢法規與行政救濟流程重新梳理了一遍，記憶更加深刻！'
+          : '📖 穩步累積！趁空檔多背了幾條常考法條與判例見解，腦中印象又紮實了一些。';
+
+      const stageChangeText =
+        beforeStage !== afterStage
+          ? `準備狀態晉升：「${beforeStage}」 ➔ 「${afterStage}」`
+          : `目前準備狀態：「${afterStage}」（持續深化記憶中）`;
 
       const story = rng.pick(vignettesData.slackStudy);
       state.lastFeedback = {
         timeLabel: tLabel,
         actionTitle: '📖 偷閒苦讀國考科目',
         detail: story,
-        finding: `📈 知識累積報告：本次實力 +${bonus}%｜累計讀書加成 +${beforeBonus}% ➔ +${afterBonus}%（逐階上榜把握度 ${fromRate}% ➔ ${toRate}% / 最高60%）`,
-        impactSummary: `國考知識累積 +${bonus}%（${getStudyReadinessHint(state)}）｜本時段無業務產出｜情緒負壓不變`,
+        finding: `📚 讀書狀態變化：${stageChangeText}`,
+        impactSummary: `國考準備：${afterStage}｜本時段無業務產出｜情緒負壓不變`,
         tone: 'good',
         progressAnim: {
           kind: 'study',
-          label: '📚 國考知識累積與上榜把握度（上限 60%）',
-          positiveBanner: posBanner,
+          label: '📚 國考準備狀態變化',
+          positiveBanner: gainDesc,
           fromValue: fromRate,
           toValue: toRate,
           maxValue: 60,
-          unit: '%',
-          deltaText: `知識 +${bonus}%（${fromRate}% ➔ ${toRate}%）`,
+          unit: '',
+          deltaText: stageChangeText,
           barTheme: 'study',
         },
       };
       addLog(
         state,
-        `【偷閒看書】知識累積 +${bonus}%（上榜把握度 ${fromRate}%➔${toRate}%）`,
+        beforeStage !== afterStage
+          ? `【偷閒看書】讀書有所突破！準備狀態由「${beforeStage}」提升至「${afterStage}」`
+          : `【偷閒看書】持續苦讀吸收法條，目前準備狀態：「${afterStage}」`,
         'good'
       );
       break;
@@ -660,7 +675,7 @@ export function conductExam(state: GameState, kind: ExamKind, rng: Rng): void {
     actionTitle: `✍️ 應試：${examName}`,
     detail: `你帶著准考證與文具進入國家考場振筆疾書（本週核給公假 2 格，本月 KPI 已按比例調降為 ${state.kpi.primaryTarget} / ${state.kpi.secondaryTarget}）。`,
     finding: `📅 預計放榜時間：${announceMonth}月第${announceWeek}週`,
-    impactSummary: `上榜把握度：${passRate}%｜下午場次將繼續應試`,
+    impactSummary: `考前準備狀態：${getStudyReadinessHint(state)}｜下午場次將繼續應試`,
     tone: 'info',
   };
 

@@ -13,6 +13,7 @@ import {
   formatTimeLabel,
   getEffectiveActionOutput,
   getRemainingSlotsInMonth,
+  getStudyReadinessHint,
   isStressPenaltyActive,
   needsExamForSpecialist,
   performSlotAction,
@@ -309,8 +310,6 @@ function renderMainGame(state: GameState) {
         )
       : 100;
 
-  const studyReadinessPct = Math.min(60, 10 + state.player.examBonus);
-
   const stressClass =
     state.player.stress >= 70
       ? 'stress-danger'
@@ -393,7 +392,7 @@ function renderMainGame(state: GameState) {
           </div>
 
           <div class="compact-meta-row">
-            <span>📖 國考把握：<strong>${canStudy ? `${studyReadinessPct}% (上限60%)` : '已轉正免考'}</strong></span>
+            <span>📖 國考準備：<strong>${getStudyReadinessHint(state)}</strong></span>
             <span>📅 本月剩 <strong>${slotsLeft}</strong> 時段｜半年未達標：<strong style="color:${
     state.halfYearFailedMonths >= 2 ? 'var(--seal-red)' : 'inherit'
   }">${state.halfYearFailedMonths}/3</strong> 月</span>
@@ -475,7 +474,7 @@ function renderMainGame(state: GameState) {
                   <div class="action-title">
                     <span>📖 偷懶看書（準備國考）</span>
                     <span class="action-tag">
-                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}知識 +1~3%
+                      ${rec.actionId === 'slack_study' ? '★ 推薦｜' : ''}精進法學實力 📚
                     </span>
                   </div>
                 </button>`
@@ -655,7 +654,18 @@ function renderActiveModalHtml(state: GameState): string {
 
           ${
             anim
-              ? `
+              ? anim.kind === 'study'
+                ? `
+            <div class="anim-progress-card">
+              <div class="anim-positive-banner ${anim.barTheme}">
+                <span>${anim.positiveBanner}</span>
+              </div>
+              <div class="anim-bar-header" style="margin-bottom: 0;">
+                <span>${anim.label}</span>
+                <span class="anim-delta-pill ${anim.barTheme}">${anim.deltaText}</span>
+              </div>
+            </div>`
+                : `
             <div class="anim-progress-card">
               <div class="anim-positive-banner ${anim.barTheme}">
                 <span>${anim.positiveBanner}</span>

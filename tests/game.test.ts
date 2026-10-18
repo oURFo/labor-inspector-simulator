@@ -184,12 +184,14 @@ describe('Labor Inspector Simulator Core Engine', () => {
     expect(state.lastFeedback?.progressAnim?.toValue).toBe(40);
     expect(state.lastFeedback?.progressAnim?.positiveBanner.length).toBeGreaterThan(5);
 
-    // 3. Study: knowledge increases with positive banner
-    state.player.examBonus = 10;
+    // 3. Study: qualitative text description only (no numbers or % signs in displayed text)
+    state.player.examBonus = 11;
     executeActionEffect(state, 'slack_study', rng);
     expect(state.lastFeedback?.progressAnim?.kind).toBe('study');
-    expect(state.lastFeedback?.progressAnim?.fromValue).toBe(20);
-    expect(state.lastFeedback?.progressAnim?.toValue).toBeGreaterThan(20);
     expect(state.lastFeedback?.progressAnim?.positiveBanner.length).toBeGreaterThan(5);
+    expect(/\d|%/.test(state.lastFeedback?.progressAnim?.positiveBanner ?? '')).toBe(false);
+    expect(/\d|%/.test(state.lastFeedback?.progressAnim?.deltaText ?? '')).toBe(false);
+    expect(/\d|%/.test(state.lastFeedback?.finding ?? '')).toBe(false);
+    expect(/\d|%/.test(state.logs[0].text)).toBe(false);
   });
 });
